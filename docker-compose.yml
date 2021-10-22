@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  mysql_go_sample:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mysql_go_sample
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: password
+      TZ: "Asia/Tokyo"
+    ports:
+      - "3306:3306"
+    restart: always
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_go_sample_data:/var/lib/mysql
+volumes:
+  mysql_go_sample_data:
