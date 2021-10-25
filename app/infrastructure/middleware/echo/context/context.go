@@ -13,6 +13,16 @@ type CustomContext struct {
 	echo.Context
 }
 
+func (c *CustomContext) BindAndValidate(logger logger.Logger, request interface{}) error {
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(logger, err)
+	}
+	return nil
+}
+
 func (c *CustomContext) CreateErrorResponse(logger logger.Logger, err error) error {
 	apiErr := web.NewApiError(err)
 	c.JSON(apiErr.HttpStatusCode, apiErr.Error)

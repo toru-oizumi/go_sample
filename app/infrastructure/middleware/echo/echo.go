@@ -7,6 +7,7 @@ import (
 	"go_sample/app/infrastructure/middleware/echo/router"
 	"go_sample/app/infrastructure/middleware/gorm"
 	"go_sample/app/infrastructure/middleware/gorm/mysql"
+	"go_sample/app/infrastructure/middleware/validator"
 	"go_sample/app/infrastructure/middleware/zap"
 
 	rest_controller "go_sample/app/interface/controller"
@@ -23,6 +24,8 @@ func Init() {
 	e.Use(middleware.Logger())
 	// アプリケーションのどこかで予期せずにpanicを起こしてしまっても、サーバは落とさずにエラーレスポンスを返せるようにリカバリーする
 	e.Use(middleware.Recover())
+
+	e.Validator = validator.NewCustomValidator()
 
 	db := mysql.NewDb()
 	repository := gorm.NewRepository(db)

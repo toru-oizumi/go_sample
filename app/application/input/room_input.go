@@ -2,45 +2,23 @@ package input
 
 import (
 	"go_sample/app/domain/model"
-
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type FindRoomByIdRequest struct {
-	Id model.RoomId `validate:"required"`
-}
-
-func (r *FindRoomByIdRequest) Validate() error {
-	validate := validator.New()
-	return validate.Struct(r)
+	Id model.RoomId `param:"id" validate:"required"`
 }
 
 type CreateRoomRequest struct {
-	Name          model.RoomName `validate:"required"`
-	OwnerUserId   model.UserId   `validate:"required"`
-	VisitorUserId model.UserId   `validate:"required"`
-}
-
-func (r *CreateRoomRequest) Validate() error {
-	validate := validator.New()
-	return validate.Struct(r)
+	Name          model.RoomName `json:"name" form:"name" validate:"required"`
+	OwnerUserId   model.UserId   `json:"ownerUserId" form:"ownerUserId" validate:"required"`
+	VisitorUserId model.UserId   `json:"visitorUserId" form:"visitorUserId" validate:"required"`
 }
 
 type UpdateRoomRequest struct {
-	Id   model.RoomId   `validate:"required"`
-	Name model.RoomName `validate:"required"`
-}
-
-func (r *UpdateRoomRequest) Validate() error {
-	validate := validator.New()
-	return validate.Struct(r)
+	Id   model.RoomId   `param:"id" validate:"required"`
+	Name model.RoomName `json:"name" form:"name" validate:"required"`
 }
 
 type DeleteRoomByIdRequest struct {
-	Id model.RoomId `validate:"required"`
-}
-
-func (r *DeleteRoomByIdRequest) Validate() error {
-	validate := validator.New()
-	return validate.Struct(r)
+	Id model.RoomId `param:"id" validate:"required"`
 }
