@@ -1,47 +1,20 @@
 package echo
 
 import (
-	"fmt"
+	ws_router "go_sample/app/infrastructure/middleware/echo/router/ws"
 
 	"go_sample/app/infrastructure/middleware/echo/context"
 	"go_sample/app/infrastructure/middleware/echo/router"
 	"go_sample/app/infrastructure/middleware/gorm"
 	"go_sample/app/infrastructure/middleware/gorm/mysql"
 	"go_sample/app/infrastructure/middleware/zap"
-	"go_sample/app/interface/controller"
+
+	rest_controller "go_sample/app/interface/controller"
+	ws_handler "go_sample/app/interface/controller/ws"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"golang.org/x/net/websocket"
 )
-
-func handleWebSocket(c echo.Context) error {
-	websocket.Handler(func(ws *websocket.Conn) {
-		defer ws.Close()
-
-		// 初回のメッセージを送信
-		err := websocket.Message.Send(ws, "Server: Hello, Client!")
-		if err != nil {
-			c.Logger().Error(err)
-		}
-
-		for {
-			// Client からのメッセージを読み込む
-			msg := ""
-			err = websocket.Message.Receive(ws, &msg)
-			if err != nil {
-				c.Logger().Error(err)
-			}
-
-			// Client からのメッセージを元に返すメッセージを作成し送信する
-			err := websocket.Message.Send(ws, fmt.Sprintf("Server: \"%s\" received!", msg))
-			if err != nil {
-				c.Logger().Error(err)
-			}
-		}
-	}).ServeHTTP(c.Response(), c.Request())
-	return nil
-}
 
 func Init() {
 	e := echo.New()
@@ -57,7 +30,8 @@ func Init() {
 
 	logger := zap.NewZapLogger()
 
-	ctrl := controller.NewController(connection, logger)
+	controller := rest_controller.NewController(connection, logger)
+	handler := ws_handler.NewWsHandler(connection, logger)
 
 	// CustomContextを使用する
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -67,10 +41,11 @@ func Init() {
 		}
 	})
 
-	router.AddUsersRoutingGroup(e, ctrl)
-	router.AddGroupsRoutingGroup(e, ctrl)
+	router.AddUsersRoutingGroup(e, controller)
+	router.AddGroupsRoutingGroup(e, controller)
+	router.AddRoomsRoutingGroup(e, controller)
 
-	e.GET("/ws", handleWebSocket)
+	ws_router.AddWsRoomsRoutingGroup(e, handler)
 
 	e.Logger.Fatal(e.Start(":18080"))
 }

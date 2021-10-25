@@ -41,3 +41,13 @@ func (c *Controller) Group() *GroupController {
 		Logger: c.logger,
 	}
 }
+
+func (c *Controller) Room() *RoomController {
+	return &RoomController{
+		Usecase: &interactor.RoomInteractor{
+			Connection: c.connection,
+			Presenter:  presenter_impl.NewRoomPresenter(),
+		},
+		Logger: c.logger,
+	}
+}

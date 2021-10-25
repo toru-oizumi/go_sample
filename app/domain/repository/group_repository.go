@@ -11,8 +11,8 @@ type GroupQuery interface {
 
 type GroupCommand interface {
 	GroupQuery
-	Store(group model.Group) (*model.Group, error)
-	Update(group model.Group) (*model.Group, error)
+	Store(object model.Group) (*model.Group, error)
+	Update(object model.Group) (*model.Group, error)
 	DeleteById(id model.GroupId) error
 }
 

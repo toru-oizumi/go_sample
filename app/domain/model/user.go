@@ -6,7 +6,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type UserId uint
+type UserId string
 
 type UserName string
 
@@ -21,9 +21,9 @@ type User struct {
 	UpdatedAt time.Time `validate:"required"`
 }
 
-func (u *User) Validate() error {
+func (m *User) Validate() error {
 	validate := validator.New()
-	return validate.Struct(u)
+	return validate.Struct(m)
 }
 
 type Users []User

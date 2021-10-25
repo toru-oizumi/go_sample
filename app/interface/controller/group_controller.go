@@ -7,7 +7,6 @@ import (
 	"go_sample/app/interface/controller/context"
 	"go_sample/app/interface/controller/logger"
 	"net/http"
-	"strconv"
 )
 
 type GroupController struct {
@@ -17,8 +16,10 @@ type GroupController struct {
 
 func (ctrl *GroupController) Find(c context.Context) error {
 	var request input.FindGroupByIdRequest
-	id, _ := strconv.Atoi(c.Param("id"))
-	request.Id = model.GroupId(id)
+	request.Id = model.GroupId(c.Param("id"))
+	if err := request.Validate(); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
 
 	if group, err := ctrl.Usecase.FindById(request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
@@ -38,6 +39,9 @@ func (ctrl *GroupController) FindAll(c context.Context) error {
 func (ctrl *GroupController) Create(c context.Context) error {
 	var request input.CreateGroupRequest
 	c.Bind(&request)
+	if err := request.Validate(); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
 
 	if group, err := ctrl.Usecase.Create(request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
@@ -49,8 +53,10 @@ func (ctrl *GroupController) Create(c context.Context) error {
 func (ctrl *GroupController) Update(c context.Context) error {
 	var request input.UpdateGroupRequest
 	c.Bind(&request)
-	id, _ := strconv.Atoi(c.Param("id"))
-	request.Id = model.GroupId(id)
+	request.Id = model.GroupId(c.Param("id"))
+	if err := request.Validate(); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
 
 	if group, err := ctrl.Usecase.Update(request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
@@ -61,8 +67,10 @@ func (ctrl *GroupController) Update(c context.Context) error {
 
 func (ctrl *GroupController) Delete(c context.Context) error {
 	var request input.DeleteGroupByIdRequest
-	id, _ := strconv.Atoi(c.Param("id"))
-	request.Id = model.GroupId(id)
+	request.Id = model.GroupId(c.Param("id"))
+	if err := request.Validate(); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
 
 	if err := ctrl.Usecase.DeleteById(request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)

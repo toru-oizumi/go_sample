@@ -11,43 +11,43 @@ func NewGroupPresenter() *GroupPresenter {
 	return &GroupPresenter{}
 }
 
-func (p *GroupPresenter) CreateFindGroupByIdResponse(group *model.Group) (*output.FindGroupByIdResponse, error) {
+func (p *GroupPresenter) BuildFindByIdResponse(object *model.Group) (*output.FindGroupByIdResponse, error) {
 	return &output.FindGroupByIdResponse{
-		Id:        group.Id,
-		Name:      group.Name,
-		CreatedAt: group.CreatedAt,
-		UpdatedAt: group.UpdatedAt,
+		Id:        object.Id,
+		Name:      object.Name,
+		CreatedAt: object.CreatedAt,
+		UpdatedAt: object.UpdatedAt,
 	}, nil
 }
-func (p *GroupPresenter) CreatFindAllGroupsResponse(groups model.Groups) (output.FindAllGroupsResponse, error) {
+func (p *GroupPresenter) BuildFindAllResponse(objects model.Groups) (output.FindAllGroupsResponse, error) {
 	var result output.FindAllGroupsResponse
-	for _, group := range groups {
+	for _, object := range objects {
 		result = append(
 			result,
 			model.Group{
-				Id:        group.Id,
-				Name:      group.Name,
-				CreatedAt: group.CreatedAt,
-				UpdatedAt: group.UpdatedAt,
+				Id:        object.Id,
+				Name:      object.Name,
+				CreatedAt: object.CreatedAt,
+				UpdatedAt: object.UpdatedAt,
 			},
 		)
 	}
 
 	return result, nil
 }
-func (p *GroupPresenter) CreateCreateGroupResponse(group *model.Group) (*output.CreateGroupResponse, error) {
+func (p *GroupPresenter) BuildCreateResponse(object *model.Group) (*output.CreateGroupResponse, error) {
 	return &output.CreateGroupResponse{
-		Id:        group.Id,
-		Name:      group.Name,
-		CreatedAt: group.CreatedAt,
-		UpdatedAt: group.UpdatedAt,
+		Id:        object.Id,
+		Name:      object.Name,
+		CreatedAt: object.CreatedAt,
+		UpdatedAt: object.UpdatedAt,
 	}, nil
 }
-func (p *GroupPresenter) CreateUpdateGroupResponse(group *model.Group) (*output.UpdateGroupResponse, error) {
+func (p *GroupPresenter) BuildUpdateResponse(object *model.Group) (*output.UpdateGroupResponse, error) {
 	return &output.UpdateGroupResponse{
-		Id:        group.Id,
-		Name:      group.Name,
-		CreatedAt: group.CreatedAt,
-		UpdatedAt: group.UpdatedAt,
+		Id:        object.Id,
+		Name:      object.Name,
+		CreatedAt: object.CreatedAt,
+		UpdatedAt: object.UpdatedAt,
 	}, nil
 }

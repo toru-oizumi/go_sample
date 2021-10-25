@@ -9,14 +9,14 @@ import (
 	"net/http"
 )
 
-type UserController struct {
-	Usecase usecase.UserUsecase
+type RoomController struct {
+	Usecase usecase.RoomUsecase
 	Logger  logger.Logger
 }
 
-func (ctrl *UserController) Find(c context.Context) error {
-	var request input.FindUserByIdRequest
-	request.Id = model.UserId(c.Param("id"))
+func (ctrl *RoomController) Find(c context.Context) error {
+	var request input.FindRoomByIdRequest
+	request.Id = model.RoomId(c.Param("id"))
 	if err := request.Validate(); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
@@ -28,7 +28,7 @@ func (ctrl *UserController) Find(c context.Context) error {
 	}
 }
 
-func (ctrl *UserController) FindAll(c context.Context) error {
+func (ctrl *RoomController) FindAll(c context.Context) error {
 	if users, err := ctrl.Usecase.FindAll(); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
@@ -36,8 +36,8 @@ func (ctrl *UserController) FindAll(c context.Context) error {
 	}
 }
 
-func (ctrl *UserController) Create(c context.Context) error {
-	var request input.CreateUserRequest
+func (ctrl *RoomController) Create(c context.Context) error {
+	var request input.CreateRoomRequest
 	c.Bind(&request)
 	if err := request.Validate(); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
@@ -50,10 +50,10 @@ func (ctrl *UserController) Create(c context.Context) error {
 	}
 }
 
-func (ctrl *UserController) Update(c context.Context) error {
-	var request input.UpdateUserRequest
+func (ctrl *RoomController) Update(c context.Context) error {
+	var request input.UpdateRoomRequest
 	c.Bind(&request)
-	request.Id = model.UserId(c.Param("id"))
+	request.Id = model.RoomId(c.Param("id"))
 	if err := request.Validate(); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
@@ -65,9 +65,9 @@ func (ctrl *UserController) Update(c context.Context) error {
 	}
 }
 
-func (ctrl *UserController) Delete(c context.Context) error {
-	var request input.DeleteUserByIdRequest
-	request.Id = model.UserId(c.Param("id"))
+func (ctrl *RoomController) Delete(c context.Context) error {
+	var request input.DeleteRoomByIdRequest
+	request.Id = model.RoomId(c.Param("id"))
 	if err := request.Validate(); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	}

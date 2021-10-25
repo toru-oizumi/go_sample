@@ -6,8 +6,8 @@ import (
 )
 
 type UserPresenter interface {
-	CreateFindUserByIdResponse(user *model.User) (*output.FindUserByIdResponse, error)
-	CreatFindAllUsersResponse(users model.Users) (output.FindAllUsersResponse, error)
-	CreateCreateUserResponse(user *model.User) (*output.CreateUserResponse, error)
-	CreateUpdateUserResponse(user *model.User) (*output.UpdateUserResponse, error)
+	BuildFindByIdResponse(object *model.User) (*output.FindUserByIdResponse, error)
+	BuildFindAllResponse(objects model.Users) (output.FindAllUsersResponse, error)
+	BuildCreateResponse(object *model.User) (*output.CreateUserResponse, error)
+	BuildUpdateResponse(object *model.User) (*output.UpdateUserResponse, error)
 }

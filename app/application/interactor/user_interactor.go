@@ -17,7 +17,7 @@ func (i *UserInteractor) FindById(request input.FindUserByIdRequest) (*output.Fi
 	if user, err := i.Connection.User().FindById(request.Id); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.CreateFindUserByIdResponse(user)
+		return i.Presenter.BuildFindByIdResponse(user)
 	}
 }
 
@@ -25,7 +25,7 @@ func (i *UserInteractor) FindAll() (output.FindAllUsersResponse, error) {
 	if users, err := i.Connection.User().List(repository.UserFilter{NameLike: ""}); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.CreatFindAllUsersResponse(users)
+		return i.Presenter.BuildFindAllResponse(users)
 	}
 }
 
@@ -53,29 +53,27 @@ func (i *UserInteractor) Create(request input.CreateUserRequest) (*output.Create
 		return nil, err
 	} else {
 		parsed_user, _ := created_user.(*model.User)
-		return i.Presenter.CreateCreateUserResponse(parsed_user)
+		return i.Presenter.BuildCreateResponse(parsed_user)
 	}
 
 }
 
 func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.UpdateUserResponse, error) {
-	user, err := i.Connection.User().FindById(request.Id)
-	if err != nil {
-		return nil, err
-	}
-
 	group, err := i.Connection.Group().FindById(request.GroupId)
 	if err != nil {
 		return nil, err
 	}
 
-	user.Name = request.Name
-	user.Age = request.Age
-	user.Group = *group
+	user := model.User{
+		Id:    request.Id,
+		Name:  request.Name,
+		Age:   request.Age,
+		Group: *group,
+	}
 
 	if updated_user, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if updated_user, err := tx.User().Update(*user); err != nil {
+			if updated_user, err := tx.User().Update(user); err != nil {
 				return nil, err
 			} else {
 				return updated_user, nil
@@ -85,7 +83,7 @@ func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.Update
 		return nil, err
 	} else {
 		parsed_user, _ := updated_user.(*model.User)
-		return i.Presenter.CreateUpdateUserResponse(parsed_user)
+		return i.Presenter.BuildUpdateResponse(parsed_user)
 	}
 }
 

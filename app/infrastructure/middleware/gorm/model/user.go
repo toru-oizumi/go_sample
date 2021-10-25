@@ -2,35 +2,39 @@ package model
 
 import (
 	"go_sample/app/domain/model"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type UserRDBRecord struct {
-	gorm.Model
-	Name    string         `gorm:"type:varchar(255);unique;not null"`
-	Age     uint           `gorm:"not null"`
-	GroupId uint           `gorm:"not null"`
-	Group   GroupRDBRecord `gorm:"foreignKey:GroupId"`
+	Id        string         `gorm:"type:varchar(255);primarykey"`
+	Name      string         `gorm:"type:varchar(255);unique;not null"`
+	Age       uint           `gorm:"not null"`
+	GroupId   string         `gorm:"not null"`
+	Group     GroupRDBRecord `gorm:"foreignKey:GroupId"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func (UserRDBRecord) TableName() string {
 	return "users"
 }
 
-func (u *UserRDBRecord) ToDomain() (*model.User, error) {
-	group, err := u.Group.ToDomain()
+func (r *UserRDBRecord) ToDomain() (*model.User, error) {
+	group, err := r.Group.ToDomain()
 	if err != nil {
 		return nil, err
 	}
 
 	user := model.User{
-		Id:        model.UserId(u.ID),
-		Name:      model.UserName(u.Name),
-		Age:       model.UserAge(u.Age),
+		Id:        model.UserId(r.Id),
+		Name:      model.UserName(r.Name),
+		Age:       model.UserAge(r.Age),
 		Group:     *group,
-		CreatedAt: u.CreatedAt,
-		UpdatedAt: u.UpdatedAt,
+		CreatedAt: r.CreatedAt,
+		UpdatedAt: r.UpdatedAt,
 	}
 
 	err = user.Validate()
@@ -45,13 +49,11 @@ func (r *UserRDBRecord) FromDomain(d model.User) UserRDBRecord {
 	db_group = db_group.FromDomain(d.Group)
 
 	return UserRDBRecord{
-		Model: gorm.Model{
-			ID:        uint(d.Id),
-			CreatedAt: d.CreatedAt,
-			UpdatedAt: d.UpdatedAt,
-		},
-		Name:    string(d.Name),
-		Age:     uint(d.Age),
-		GroupId: uint(db_group.ID),
+		Id:        string(d.Id),
+		Name:      string(d.Name),
+		Age:       uint(d.Age),
+		GroupId:   string(db_group.Id),
+		CreatedAt: d.CreatedAt,
+		UpdatedAt: d.UpdatedAt,
 	}
 }

@@ -11,8 +11,8 @@ type UserQuery interface {
 
 type UserCommand interface {
 	UserQuery
-	Store(user model.User) (*model.User, error)
-	Update(user model.User) (*model.User, error)
+	Store(object model.User) (*model.User, error)
+	Update(object model.User) (*model.User, error)
 	DeleteById(id model.UserId) error
 }
 

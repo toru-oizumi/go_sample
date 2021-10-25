@@ -6,7 +6,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type GroupId uint
+type GroupId string
 type GroupName string
 
 type Group struct {
@@ -16,9 +16,9 @@ type Group struct {
 	UpdatedAt time.Time `validate:"required"`
 }
 
-func (g *Group) Validate() error {
+func (m *Group) Validate() error {
 	validate := validator.New()
-	return validate.Struct(g)
+	return validate.Struct(m)
 }
 
 type Groups []Group

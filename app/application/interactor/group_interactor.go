@@ -17,15 +17,15 @@ func (i *GroupInteractor) FindById(request input.FindGroupByIdRequest) (*output.
 	if group, err := i.Connection.Group().FindById(request.Id); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.CreateFindGroupByIdResponse(group)
+		return i.Presenter.BuildFindByIdResponse(group)
 	}
 }
 
 func (i *GroupInteractor) FindAll() (output.FindAllGroupsResponse, error) {
-	if groups, err := i.Connection.Group().List(repository.GroupFilter{UserID: model.UserId(1)}); err != nil {
+	if groups, err := i.Connection.Group().List(repository.GroupFilter{UserID: model.UserId("1")}); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.CreatFindAllGroupsResponse(groups)
+		return i.Presenter.BuildFindAllResponse(groups)
 	}
 }
 
@@ -46,21 +46,19 @@ func (i *GroupInteractor) Create(request input.CreateGroupRequest) (*output.Crea
 		return nil, err
 	} else {
 		parsed_group, _ := created_group.(*model.Group)
-		return i.Presenter.CreateCreateGroupResponse(parsed_group)
+		return i.Presenter.BuildCreateResponse(parsed_group)
 	}
 }
 
 func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.UpdateGroupResponse, error) {
-	group, err := i.Connection.Group().FindById(request.Id)
-	if err != nil {
-		return nil, err
+	group := model.Group{
+		Id:   request.Id,
+		Name: request.Name,
 	}
-
-	group.Name = request.Name
 
 	if updated_group, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if updated_group, err := tx.Group().Update(*group); err != nil {
+			if updated_group, err := tx.Group().Update(group); err != nil {
 				return nil, err
 			} else {
 				return updated_group, nil
@@ -70,7 +68,7 @@ func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.Upda
 		return nil, err
 	} else {
 		parsed_group, _ := updated_group.(*model.Group)
-		return i.Presenter.CreateUpdateGroupResponse(parsed_group)
+		return i.Presenter.BuildUpdateResponse(parsed_group)
 	}
 }
 
