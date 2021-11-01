@@ -14,11 +14,11 @@ type Connection interface {
 type Query interface {
 	User() UserQuery
 	Group() GroupQuery
-	Room() RoomQuery
+	Play() PlayQuery
 }
 
 type Transaction interface {
 	User() UserCommand
 	Group() GroupCommand
-	Room() RoomCommand
+	Play() PlayCommand
 }

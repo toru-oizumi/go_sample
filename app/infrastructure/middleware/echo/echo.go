@@ -46,7 +46,7 @@ func Init() {
 
 	router.AddUsersRoutingGroup(e, controller)
 	router.AddGroupsRoutingGroup(e, controller)
-	router.AddRoomsRoutingGroup(e, controller)
+	router.AddPlaysRoutingGroup(e, controller)
 
 	ws_router.AddWsRoutingGroup(e, ws_handler)
 

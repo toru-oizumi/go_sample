@@ -8,28 +8,28 @@ import (
 	"go_sample/app/domain/repository"
 )
 
-type RoomInteractor struct {
+type PlayInteractor struct {
 	Connection repository.Connection
-	Presenter  presenter.RoomPresenter
+	Presenter  presenter.PlayPresenter
 }
 
-func (i *RoomInteractor) FindByID(request input.FindRoomByIDRequest) (*output.FindRoomByIDResponse, error) {
-	if room, err := i.Connection.Room().FindByID(request.ID); err != nil {
+func (i *PlayInteractor) FindByID(request input.FindPlayByIDRequest) (*output.FindPlayByIDResponse, error) {
+	if room, err := i.Connection.Play().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
 		return i.Presenter.BuildFindByIDResponse(room)
 	}
 }
 
-func (i *RoomInteractor) FindAll() (output.FindAllRoomsResponse, error) {
-	if rooms, err := i.Connection.Room().List(repository.RoomFilter{RoomID: ""}); err != nil {
+func (i *PlayInteractor) FindAll() (output.FindAllPlaysResponse, error) {
+	if rooms, err := i.Connection.Play().List(repository.PlayFilter{PlayID: ""}); err != nil {
 		return nil, err
 	} else {
 		return i.Presenter.BuildFindAllResponse(rooms)
 	}
 }
 
-func (i *RoomInteractor) Create(request input.CreateRoomRequest) (*output.CreateRoomResponse, error) {
+func (i *PlayInteractor) Create(request input.CreatePlayRequest) (*output.CreatePlayResponse, error) {
 	owner_user, err := i.Connection.User().FindByID(request.OwnerUserID)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (i *RoomInteractor) Create(request input.CreateRoomRequest) (*output.Create
 		return nil, err
 	}
 
-	room := model.Room{
+	room := model.Play{
 		Name:          request.Name,
 		OwnerUserID:   owner_user.ID,
 		VisitorUserID: visitor_user.ID,
@@ -48,7 +48,7 @@ func (i *RoomInteractor) Create(request input.CreateRoomRequest) (*output.Create
 
 	if created_room, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if created_room, err := tx.Room().Store(room); err != nil {
+			if created_room, err := tx.Play().Store(room); err != nil {
 				return nil, err
 			} else {
 				return created_room, nil
@@ -57,21 +57,21 @@ func (i *RoomInteractor) Create(request input.CreateRoomRequest) (*output.Create
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_room, _ := created_room.(*model.Room)
+		parsed_room, _ := created_room.(*model.Play)
 		return i.Presenter.BuildCreateResponse(parsed_room)
 	}
 
 }
 
-func (i *RoomInteractor) Update(request input.UpdateRoomRequest) (*output.UpdateRoomResponse, error) {
-	room := model.Room{
+func (i *PlayInteractor) Update(request input.UpdatePlayRequest) (*output.UpdatePlayResponse, error) {
+	room := model.Play{
 		ID:   request.ID,
 		Name: request.Name,
 	}
 
 	if updated_room, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if updated_room, err := tx.Room().Update(room); err != nil {
+			if updated_room, err := tx.Play().Update(room); err != nil {
 				return nil, err
 			} else {
 				return updated_room, nil
@@ -80,19 +80,19 @@ func (i *RoomInteractor) Update(request input.UpdateRoomRequest) (*output.Update
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_room, _ := updated_room.(*model.Room)
+		parsed_room, _ := updated_room.(*model.Play)
 		return i.Presenter.BuildUpdateResponse(parsed_room)
 	}
 }
 
-func (i *RoomInteractor) DeleteByID(request input.DeleteRoomByIDRequest) error {
-	if _, err := i.Connection.Room().FindByID(request.ID); err != nil {
+func (i *PlayInteractor) DeleteByID(request input.DeletePlayByIDRequest) error {
+	if _, err := i.Connection.Play().FindByID(request.ID); err != nil {
 		return err
 	}
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Room().DeleteByID(request.ID); err != nil {
+			if err := tx.Play().DeleteByID(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil

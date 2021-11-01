@@ -42,11 +42,11 @@ func (c *Controller) Group() *GroupController {
 	}
 }
 
-func (c *Controller) Room() *RoomController {
-	return &RoomController{
-		Usecase: &interactor.RoomInteractor{
+func (c *Controller) Play() *PlayController {
+	return &PlayController{
+		Usecase: &interactor.PlayInteractor{
 			Connection: c.connection,
-			Presenter:  presenter_impl.NewRoomPresenter(),
+			Presenter:  presenter_impl.NewPlayPresenter(),
 		},
 		Logger: c.logger,
 	}

@@ -5,14 +5,14 @@ import (
 	"go_sample/app/domain/model"
 )
 
-type RoomPresenter struct{}
+type PlayPresenter struct{}
 
-func NewRoomPresenter() *RoomPresenter {
-	return &RoomPresenter{}
+func NewPlayPresenter() *PlayPresenter {
+	return &PlayPresenter{}
 }
 
-func (p *RoomPresenter) BuildFindByIDResponse(object *model.Room) (*output.FindRoomByIDResponse, error) {
-	return &output.FindRoomByIDResponse{
+func (p *PlayPresenter) BuildFindByIDResponse(object *model.Play) (*output.FindPlayByIDResponse, error) {
+	return &output.FindPlayByIDResponse{
 		ID:            object.ID,
 		Name:          object.Name,
 		OwnerUserID:   object.OwnerUserID,
@@ -21,12 +21,12 @@ func (p *RoomPresenter) BuildFindByIDResponse(object *model.Room) (*output.FindR
 		UpdatedAt:     object.UpdatedAt,
 	}, nil
 }
-func (p *RoomPresenter) BuildFindAllResponse(objects model.Rooms) (output.FindAllRoomsResponse, error) {
-	var result output.FindAllRoomsResponse
+func (p *PlayPresenter) BuildFindAllResponse(objects model.Plays) (output.FindAllPlaysResponse, error) {
+	var result output.FindAllPlaysResponse
 	for _, object := range objects {
 		result = append(
 			result,
-			model.Room{
+			model.Play{
 				ID:            object.ID,
 				Name:          object.Name,
 				OwnerUserID:   object.OwnerUserID,
@@ -39,8 +39,8 @@ func (p *RoomPresenter) BuildFindAllResponse(objects model.Rooms) (output.FindAl
 
 	return result, nil
 }
-func (p *RoomPresenter) BuildCreateResponse(object *model.Room) (*output.CreateRoomResponse, error) {
-	return &output.CreateRoomResponse{
+func (p *PlayPresenter) BuildCreateResponse(object *model.Play) (*output.CreatePlayResponse, error) {
+	return &output.CreatePlayResponse{
 		ID:            object.ID,
 		Name:          object.Name,
 		OwnerUserID:   object.OwnerUserID,
@@ -49,8 +49,8 @@ func (p *RoomPresenter) BuildCreateResponse(object *model.Room) (*output.CreateR
 		UpdatedAt:     object.UpdatedAt,
 	}, nil
 }
-func (p *RoomPresenter) BuildUpdateResponse(object *model.Room) (*output.UpdateRoomResponse, error) {
-	return &output.UpdateRoomResponse{
+func (p *PlayPresenter) BuildUpdateResponse(object *model.Play) (*output.UpdatePlayResponse, error) {
+	return &output.UpdatePlayResponse{
 		ID:            object.ID,
 		Name:          object.Name,
 		OwnerUserID:   object.OwnerUserID,

@@ -6,22 +6,22 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type RoomID string
+type PlayID string
 
-type RoomName string
+type PlayName string
 
-type Room struct {
-	ID            RoomID `validate:"required"`
-	Name          RoomName
+type Play struct {
+	ID            PlayID `validate:"required"`
+	Name          PlayName
 	OwnerUserID   UserID    `validate:"required"`
 	VisitorUserID UserID    `validate:"required"`
 	CreatedAt     time.Time `validate:"required"`
 	UpdatedAt     time.Time `validate:"required"`
 }
 
-func (m *Room) Validate() error {
+func (m *Play) Validate() error {
 	validate := validator.New()
 	return validate.Struct(m)
 }
 
-type Rooms []Room
+type Plays []Play

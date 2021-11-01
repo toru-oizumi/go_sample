@@ -64,8 +64,8 @@ func (con *dbConnection) User() repository.UserQuery {
 func (con *dbConnection) Group() repository.GroupQuery {
 	return &repository_impl.GroupRepository{Db: con.db}
 }
-func (con *dbConnection) Room() repository.RoomQuery {
-	return &repository_impl.RoomRepository{Db: con.db}
+func (con *dbConnection) Play() repository.PlayQuery {
+	return &repository_impl.PlayRepository{Db: con.db}
 }
 
 type dbTransaction struct {
@@ -78,6 +78,6 @@ func (tx *dbTransaction) User() repository.UserCommand {
 func (tx *dbTransaction) Group() repository.GroupCommand {
 	return &repository_impl.GroupRepository{Db: tx.db}
 }
-func (tx *dbTransaction) Room() repository.RoomCommand {
-	return &repository_impl.RoomRepository{Db: tx.db}
+func (tx *dbTransaction) Play() repository.PlayCommand {
+	return &repository_impl.PlayRepository{Db: tx.db}
 }

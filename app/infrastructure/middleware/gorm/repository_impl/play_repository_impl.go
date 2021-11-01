@@ -15,12 +15,12 @@ import (
 	db_model "go_sample/app/infrastructure/middleware/gorm/model"
 )
 
-type RoomRepository struct {
+type PlayRepository struct {
 	Db *gorm.DB
 }
 
-func (repo *RoomRepository) FindByID(id model.RoomID) (*model.Room, error) {
-	var db_room db_model.RoomRDBRecord
+func (repo *PlayRepository) FindByID(id model.PlayID) (*model.Play, error) {
+	var db_room db_model.PlayRDBRecord
 
 	if err := repo.Db.Take(&db_room, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -36,9 +36,9 @@ func (repo *RoomRepository) FindByID(id model.RoomID) (*model.Room, error) {
 	}
 }
 
-func (repo *RoomRepository) List(filter repository.RoomFilter) (model.Rooms, error) {
-	var db_rooms []db_model.RoomRDBRecord
-	var rooms model.Rooms
+func (repo *PlayRepository) List(filter repository.PlayFilter) (model.Plays, error) {
+	var db_rooms []db_model.PlayRDBRecord
+	var rooms model.Plays
 
 	if err := repo.Db.Find(&db_rooms).Error; err != nil {
 		return nil, err
@@ -54,8 +54,8 @@ func (repo *RoomRepository) List(filter repository.RoomFilter) (model.Rooms, err
 	}
 }
 
-func (repo *RoomRepository) Store(object model.Room) (*model.Room, error) {
-	var db_room db_model.RoomRDBRecord
+func (repo *PlayRepository) Store(object model.Play) (*model.Play, error) {
+	var db_room db_model.PlayRDBRecord
 	db_room = db_room.FromDomain(object)
 	db_room.ID = utility.GetUlid()
 
@@ -70,15 +70,15 @@ func (repo *RoomRepository) Store(object model.Room) (*model.Room, error) {
 		return nil, err
 	}
 
-	if room, err := repo.FindByID(model.RoomID(db_room.ID)); err != nil {
+	if room, err := repo.FindByID(model.PlayID(db_room.ID)); err != nil {
 		return nil, err
 	} else {
 		return room, nil
 	}
 }
 
-func (repo *RoomRepository) Update(object model.Room) (*model.Room, error) {
-	var db_room db_model.RoomRDBRecord
+func (repo *PlayRepository) Update(object model.Play) (*model.Play, error) {
+	var db_room db_model.PlayRDBRecord
 	if err := repo.Db.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_room, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
@@ -98,15 +98,15 @@ func (repo *RoomRepository) Update(object model.Room) (*model.Room, error) {
 		return nil, err
 	}
 
-	if room, err := repo.FindByID(model.RoomID(db_room.ID)); err != nil {
+	if room, err := repo.FindByID(model.PlayID(db_room.ID)); err != nil {
 		return nil, err
 	} else {
 		return room, nil
 	}
 }
 
-func (repo *RoomRepository) DeleteByID(id model.RoomID) error {
-	var db_room db_model.RoomRDBRecord
+func (repo *PlayRepository) DeleteByID(id model.PlayID) error {
+	var db_room db_model.PlayRDBRecord
 	if err := repo.Db.Take(&db_room, string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return util_error.NewErrRecordNotFound()

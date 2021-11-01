@@ -32,7 +32,7 @@ func NewDb() *gorm.DB {
 
 	db.AutoMigrate(&model.UserRDBRecord{})
 	db.AutoMigrate(&model.GroupRDBRecord{})
-	db.AutoMigrate(&model.RoomRDBRecord{})
+	db.AutoMigrate(&model.PlayRDBRecord{})
 
 	return db
 }
