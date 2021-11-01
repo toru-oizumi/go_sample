@@ -34,7 +34,7 @@ func Init() {
 	logger := zap.NewZapLogger()
 
 	controller := rest_controller.NewController(connection, logger)
-	handler := ws_handler.NewWsHandler(connection, logger)
+	ws_handler := ws_handler.NewWsHandler(connection, logger)
 
 	// CustomContextを使用する
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -48,7 +48,7 @@ func Init() {
 	router.AddGroupsRoutingGroup(e, controller)
 	router.AddRoomsRoutingGroup(e, controller)
 
-	ws_router.AddWsRoomsRoutingGroup(e, handler)
+	ws_router.AddWsRoutingGroup(e, ws_handler)
 
 	e.Logger.Fatal(e.Start(":18080"))
 }
