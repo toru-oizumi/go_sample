@@ -6,9 +6,9 @@ import (
 )
 
 type UserUsecase interface {
-	FindById(request input.FindUserByIdRequest) (*output.FindUserByIdResponse, error)
+	FindByID(request input.FindUserByIDRequest) (*output.FindUserByIDResponse, error)
 	FindAll() (output.FindAllUsersResponse, error)
 	Create(request input.CreateUserRequest) (*output.CreateUserResponse, error)
 	Update(request input.UpdateUserRequest) (*output.UpdateUserResponse, error)
-	DeleteById(request input.DeleteUserByIdRequest) error
+	DeleteByID(request input.DeleteUserByIDRequest) error
 }

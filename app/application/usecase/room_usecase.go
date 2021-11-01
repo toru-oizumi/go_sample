@@ -6,9 +6,9 @@ import (
 )
 
 type RoomUsecase interface {
-	FindById(request input.FindRoomByIdRequest) (*output.FindRoomByIdResponse, error)
+	FindByID(request input.FindRoomByIDRequest) (*output.FindRoomByIDResponse, error)
 	FindAll() (output.FindAllRoomsResponse, error)
 	Create(request input.CreateRoomRequest) (*output.CreateRoomResponse, error)
 	Update(request input.UpdateRoomRequest) (*output.UpdateRoomResponse, error)
-	DeleteById(request input.DeleteRoomByIdRequest) error
+	DeleteByID(request input.DeleteRoomByIDRequest) error
 }

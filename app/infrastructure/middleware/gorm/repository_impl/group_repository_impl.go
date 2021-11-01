@@ -19,7 +19,7 @@ type GroupRepository struct {
 	Db *gorm.DB
 }
 
-func (repo *GroupRepository) FindById(id model.GroupId) (*model.Group, error) {
+func (repo *GroupRepository) FindByID(id model.GroupID) (*model.Group, error) {
 	var db_group db_model.GroupRDBRecord
 
 	if err := repo.Db.Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
@@ -48,7 +48,7 @@ func (repo *GroupRepository) List(filter repository.GroupFilter) (model.Groups, 
 func (repo *GroupRepository) Store(object model.Group) (*model.Group, error) {
 	var db_group db_model.GroupRDBRecord
 	db_group = db_group.FromDomain(object)
-	db_group.Id = utility.GetUlid()
+	db_group.ID = utility.GetUlid()
 
 	if err := repo.Db.Create(&db_group).Error; err != nil {
 		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
@@ -71,7 +71,7 @@ func (repo *GroupRepository) Store(object model.Group) (*model.Group, error) {
 
 func (repo *GroupRepository) Update(object model.Group) (*model.Group, error) {
 	var db_group db_model.GroupRDBRecord
-	if err := repo.Db.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(object.Id)).Error; err != nil {
+	if err := repo.Db.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
 		}
@@ -98,7 +98,7 @@ func (repo *GroupRepository) Update(object model.Group) (*model.Group, error) {
 	}
 }
 
-func (repo *GroupRepository) DeleteById(id model.GroupId) error {
+func (repo *GroupRepository) DeleteByID(id model.GroupID) error {
 	var db_group db_model.GroupRDBRecord
 	if err := repo.Db.Take(&db_group, string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

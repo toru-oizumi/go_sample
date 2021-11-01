@@ -14,12 +14,12 @@ type GroupController struct {
 }
 
 func (ctrl *GroupController) Find(c context.Context) error {
-	request := new(input.FindGroupByIdRequest)
+	request := new(input.FindGroupByIDRequest)
 	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
 		return err
 	}
 
-	if group, err := ctrl.Usecase.FindById(*request); err != nil {
+	if group, err := ctrl.Usecase.FindByID(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusOK, group)
@@ -61,12 +61,12 @@ func (ctrl *GroupController) Update(c context.Context) error {
 }
 
 func (ctrl *GroupController) Delete(c context.Context) error {
-	request := new(input.DeleteGroupByIdRequest)
+	request := new(input.DeleteGroupByIDRequest)
 	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
 		return err
 	}
 
-	if err := ctrl.Usecase.DeleteById(*request); err != nil {
+	if err := ctrl.Usecase.DeleteByID(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusNoContent, nil)

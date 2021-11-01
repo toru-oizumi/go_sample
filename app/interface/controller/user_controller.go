@@ -14,12 +14,12 @@ type UserController struct {
 }
 
 func (ctrl *UserController) Find(c context.Context) error {
-	request := new(input.FindUserByIdRequest)
+	request := new(input.FindUserByIDRequest)
 	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
 		return err
 	}
 
-	if user, err := ctrl.Usecase.FindById(*request); err != nil {
+	if user, err := ctrl.Usecase.FindByID(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusOK, user)
@@ -61,12 +61,12 @@ func (ctrl *UserController) Update(c context.Context) error {
 }
 
 func (ctrl *UserController) Delete(c context.Context) error {
-	request := new(input.DeleteUserByIdRequest)
+	request := new(input.DeleteUserByIDRequest)
 	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
 		return err
 	}
 
-	if err := ctrl.Usecase.DeleteById(*request); err != nil {
+	if err := ctrl.Usecase.DeleteByID(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusNoContent, nil)

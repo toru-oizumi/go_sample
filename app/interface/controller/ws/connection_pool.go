@@ -13,12 +13,12 @@ import (
 // connectionは１ユーザに1個、ログイン時に作成、ログアウト時に削除
 // なのでユーザーIDをキーにconnectionのMAPを持つ
 var connectionPool = ConnectionPool{
-	connections: make(map[model.UserId]Connection),
+	connections: make(map[model.UserID]Connection),
 }
 
 type ConnectionPool struct {
 	sync.RWMutex
-	connections map[model.UserId]Connection
+	connections map[model.UserID]Connection
 }
 
 func (c *ConnectionPool) FilterConnectionsByObjective(o enum_connection.Objective, id string) []*websocket.Conn {
@@ -35,7 +35,7 @@ func (c *ConnectionPool) FilterConnectionsByObjective(o enum_connection.Objectiv
 }
 
 func (c *ConnectionPool) AddConnection(
-	u model.UserId,
+	u model.UserID,
 	o enum_connection.Objective,
 	id string,
 	con *websocket.Conn) error {
@@ -56,7 +56,7 @@ func (c *ConnectionPool) AddConnection(
 }
 
 func (c *ConnectionPool) RemoveConnection(
-	u model.UserId,
+	u model.UserID,
 	o enum_connection.Objective,
 ) {
 	c.Lock()
@@ -74,7 +74,7 @@ func (c *ConnectionPool) RemoveConnection(
 type Connection struct {
 	// objectivesは
 	// key: ConnectionObjective,
-	// value:id(各IdにParseして使用するstring型)
+	// value:id(各IDにParseして使用するstring型)
 	wsConnection *websocket.Conn
 	objectives   map[enum_connection.Objective]string
 }

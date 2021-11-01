@@ -13,16 +13,16 @@ type GroupInteractor struct {
 	Presenter  presenter.GroupPresenter
 }
 
-func (i *GroupInteractor) FindById(request input.FindGroupByIdRequest) (*output.FindGroupByIdResponse, error) {
-	if group, err := i.Connection.Group().FindById(request.Id); err != nil {
+func (i *GroupInteractor) FindByID(request input.FindGroupByIDRequest) (*output.FindGroupByIDResponse, error) {
+	if group, err := i.Connection.Group().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindByIdResponse(group)
+		return i.Presenter.BuildFindByIDResponse(group)
 	}
 }
 
 func (i *GroupInteractor) FindAll() (output.FindAllGroupsResponse, error) {
-	if groups, err := i.Connection.Group().List(repository.GroupFilter{UserID: model.UserId("1")}); err != nil {
+	if groups, err := i.Connection.Group().List(repository.GroupFilter{UserID: model.UserID("1")}); err != nil {
 		return nil, err
 	} else {
 		return i.Presenter.BuildFindAllResponse(groups)
@@ -52,7 +52,7 @@ func (i *GroupInteractor) Create(request input.CreateGroupRequest) (*output.Crea
 
 func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.UpdateGroupResponse, error) {
 	group := model.Group{
-		Id:   request.Id,
+		ID:   request.ID,
 		Name: request.Name,
 	}
 
@@ -72,13 +72,13 @@ func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.Upda
 	}
 }
 
-func (i *GroupInteractor) DeleteById(request input.DeleteGroupByIdRequest) error {
-	if _, err := i.Connection.Group().FindById(request.Id); err != nil {
+func (i *GroupInteractor) DeleteByID(request input.DeleteGroupByIDRequest) error {
+	if _, err := i.Connection.Group().FindByID(request.ID); err != nil {
 		return err
 	}
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Group().DeleteById(request.Id); err != nil {
+			if err := tx.Group().DeleteByID(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil

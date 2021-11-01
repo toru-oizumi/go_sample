@@ -5,7 +5,7 @@ import (
 )
 
 type UserQuery interface {
-	FindById(id model.UserId) (*model.User, error)
+	FindByID(id model.UserID) (*model.User, error)
 	List(filter UserFilter) (model.Users, error)
 }
 
@@ -13,7 +13,7 @@ type UserCommand interface {
 	UserQuery
 	Store(object model.User) (*model.User, error)
 	Update(object model.User) (*model.User, error)
-	DeleteById(id model.UserId) error
+	DeleteByID(id model.UserID) error
 }
 
 type UserFilter struct {

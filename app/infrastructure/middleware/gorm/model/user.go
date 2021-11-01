@@ -8,11 +8,11 @@ import (
 )
 
 type UserRDBRecord struct {
-	Id        string         `gorm:"type:varchar(255);primarykey"`
+	ID        string         `gorm:"type:varchar(255);primarykey"`
 	Name      string         `gorm:"type:varchar(255);unique;not null"`
 	Age       uint           `gorm:"not null"`
-	GroupId   string         `gorm:"not null"`
-	Group     GroupRDBRecord `gorm:"foreignKey:GroupId"`
+	GroupID   string         `gorm:"not null"`
+	Group     GroupRDBRecord `gorm:"foreignKey:GroupID"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
@@ -29,7 +29,7 @@ func (r *UserRDBRecord) ToDomain() (*model.User, error) {
 	}
 
 	user := model.User{
-		Id:        model.UserId(r.Id),
+		ID:        model.UserID(r.ID),
 		Name:      model.UserName(r.Name),
 		Age:       model.UserAge(r.Age),
 		Group:     *group,
@@ -49,10 +49,10 @@ func (r *UserRDBRecord) FromDomain(d model.User) UserRDBRecord {
 	db_group = db_group.FromDomain(d.Group)
 
 	return UserRDBRecord{
-		Id:        string(d.Id),
+		ID:        string(d.ID),
 		Name:      string(d.Name),
 		Age:       uint(d.Age),
-		GroupId:   string(db_group.Id),
+		GroupID:   string(db_group.ID),
 		CreatedAt: d.CreatedAt,
 		UpdatedAt: d.UpdatedAt,
 	}

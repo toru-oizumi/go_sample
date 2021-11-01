@@ -5,7 +5,7 @@ import (
 )
 
 type GroupQuery interface {
-	FindById(id model.GroupId) (*model.Group, error)
+	FindByID(id model.GroupID) (*model.Group, error)
 	List(filter GroupFilter) (model.Groups, error)
 }
 
@@ -13,9 +13,9 @@ type GroupCommand interface {
 	GroupQuery
 	Store(object model.Group) (*model.Group, error)
 	Update(object model.Group) (*model.Group, error)
-	DeleteById(id model.GroupId) error
+	DeleteByID(id model.GroupID) error
 }
 
 type GroupFilter struct {
-	UserID model.UserId
+	UserID model.UserID
 }

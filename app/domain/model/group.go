@@ -6,11 +6,11 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type GroupId string
+type GroupID string
 type GroupName string
 
 type Group struct {
-	Id        GroupId   `validate:"required"`
+	ID        GroupID   `validate:"required"`
 	Name      GroupName `validate:"required"`
 	CreatedAt time.Time `validate:"required"`
 	UpdatedAt time.Time `validate:"required"`

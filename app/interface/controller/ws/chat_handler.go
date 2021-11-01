@@ -19,13 +19,13 @@ type ChatWsHandler struct {
 
 type ChatRequest struct {
 	Message string         `json:"message"`
-	SendTo  []model.UserId `json:"sendTo"`
+	SendTo  []model.UserID `json:"sendTo"`
 }
 
 func (handler *ChatWsHandler) Handle(c echo.Context) error {
 	room_id := c.Param("id")
 	// user_idはCognito（というかJWT）から取得する想定
-	user_id := model.UserId(c.QueryParam("user_id"))
+	user_id := model.UserID(c.QueryParam("user_id"))
 
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {

@@ -11,12 +11,12 @@ func NewRoomPresenter() *RoomPresenter {
 	return &RoomPresenter{}
 }
 
-func (p *RoomPresenter) BuildFindByIdResponse(object *model.Room) (*output.FindRoomByIdResponse, error) {
-	return &output.FindRoomByIdResponse{
-		Id:            object.Id,
+func (p *RoomPresenter) BuildFindByIDResponse(object *model.Room) (*output.FindRoomByIDResponse, error) {
+	return &output.FindRoomByIDResponse{
+		ID:            object.ID,
 		Name:          object.Name,
-		OwnerUserId:   object.OwnerUserId,
-		VisitorUserId: object.VisitorUserId,
+		OwnerUserID:   object.OwnerUserID,
+		VisitorUserID: object.VisitorUserID,
 		CreatedAt:     object.CreatedAt,
 		UpdatedAt:     object.UpdatedAt,
 	}, nil
@@ -27,10 +27,10 @@ func (p *RoomPresenter) BuildFindAllResponse(objects model.Rooms) (output.FindAl
 		result = append(
 			result,
 			model.Room{
-				Id:            object.Id,
+				ID:            object.ID,
 				Name:          object.Name,
-				OwnerUserId:   object.OwnerUserId,
-				VisitorUserId: object.VisitorUserId,
+				OwnerUserID:   object.OwnerUserID,
+				VisitorUserID: object.VisitorUserID,
 				CreatedAt:     object.CreatedAt,
 				UpdatedAt:     object.UpdatedAt,
 			},
@@ -41,20 +41,20 @@ func (p *RoomPresenter) BuildFindAllResponse(objects model.Rooms) (output.FindAl
 }
 func (p *RoomPresenter) BuildCreateResponse(object *model.Room) (*output.CreateRoomResponse, error) {
 	return &output.CreateRoomResponse{
-		Id:            object.Id,
+		ID:            object.ID,
 		Name:          object.Name,
-		OwnerUserId:   object.OwnerUserId,
-		VisitorUserId: object.VisitorUserId,
+		OwnerUserID:   object.OwnerUserID,
+		VisitorUserID: object.VisitorUserID,
 		CreatedAt:     object.CreatedAt,
 		UpdatedAt:     object.UpdatedAt,
 	}, nil
 }
 func (p *RoomPresenter) BuildUpdateResponse(object *model.Room) (*output.UpdateRoomResponse, error) {
 	return &output.UpdateRoomResponse{
-		Id:            object.Id,
+		ID:            object.ID,
 		Name:          object.Name,
-		OwnerUserId:   object.OwnerUserId,
-		VisitorUserId: object.VisitorUserId,
+		OwnerUserID:   object.OwnerUserID,
+		VisitorUserID: object.VisitorUserID,
 		CreatedAt:     object.CreatedAt,
 		UpdatedAt:     object.UpdatedAt,
 	}, nil

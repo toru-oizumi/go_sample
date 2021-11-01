@@ -20,7 +20,7 @@ type UserRepository struct {
 	Db *gorm.DB
 }
 
-func (repo *UserRepository) FindById(id model.UserId) (*model.User, error) {
+func (repo *UserRepository) FindByID(id model.UserID) (*model.User, error) {
 	var db_user db_model.UserRDBRecord
 
 	if err := repo.Db.Joins("Group").Take(
@@ -62,7 +62,7 @@ func (repo *UserRepository) List(filter repository.UserFilter) (model.Users, err
 func (repo *UserRepository) Store(object model.User) (*model.User, error) {
 	var db_user db_model.UserRDBRecord
 	db_user = db_user.FromDomain(object)
-	db_user.Id = utility.GetUlid()
+	db_user.ID = utility.GetUlid()
 
 	if err := repo.Db.Create(&db_user).Error; err != nil {
 		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
@@ -75,7 +75,7 @@ func (repo *UserRepository) Store(object model.User) (*model.User, error) {
 		return nil, err
 	}
 
-	if user, err := repo.FindById(model.UserId(db_user.Id)); err != nil {
+	if user, err := repo.FindByID(model.UserID(db_user.ID)); err != nil {
 		return nil, err
 	} else {
 		return user, nil
@@ -85,7 +85,7 @@ func (repo *UserRepository) Store(object model.User) (*model.User, error) {
 func (repo *UserRepository) Update(object model.User) (*model.User, error) {
 	var db_user db_model.UserRDBRecord
 
-	if err := repo.Db.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_user, string(object.Id)).Error; err != nil {
+	if err := repo.Db.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_user, string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
 		}
@@ -93,7 +93,7 @@ func (repo *UserRepository) Update(object model.User) (*model.User, error) {
 	}
 	db_user.Name = string(object.Name)
 	db_user.Age = uint(object.Age)
-	db_user.GroupId = string(object.Group.Id)
+	db_user.GroupID = string(object.Group.ID)
 
 	if err := repo.Db.Save(&db_user).Error; err != nil {
 		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
@@ -106,14 +106,14 @@ func (repo *UserRepository) Update(object model.User) (*model.User, error) {
 		return nil, err
 	}
 
-	if user, err := repo.FindById(model.UserId(db_user.Id)); err != nil {
+	if user, err := repo.FindByID(model.UserID(db_user.ID)); err != nil {
 		return nil, err
 	} else {
 		return user, nil
 	}
 }
 
-func (repo *UserRepository) DeleteById(id model.UserId) error {
+func (repo *UserRepository) DeleteByID(id model.UserID) error {
 	var db_user db_model.UserRDBRecord
 	if err := repo.Db.Take(&db_user, string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

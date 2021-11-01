@@ -13,11 +13,11 @@ type RoomInteractor struct {
 	Presenter  presenter.RoomPresenter
 }
 
-func (i *RoomInteractor) FindById(request input.FindRoomByIdRequest) (*output.FindRoomByIdResponse, error) {
-	if room, err := i.Connection.Room().FindById(request.Id); err != nil {
+func (i *RoomInteractor) FindByID(request input.FindRoomByIDRequest) (*output.FindRoomByIDResponse, error) {
+	if room, err := i.Connection.Room().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindByIdResponse(room)
+		return i.Presenter.BuildFindByIDResponse(room)
 	}
 }
 
@@ -30,20 +30,20 @@ func (i *RoomInteractor) FindAll() (output.FindAllRoomsResponse, error) {
 }
 
 func (i *RoomInteractor) Create(request input.CreateRoomRequest) (*output.CreateRoomResponse, error) {
-	owner_user, err := i.Connection.User().FindById(request.OwnerUserId)
+	owner_user, err := i.Connection.User().FindByID(request.OwnerUserID)
 	if err != nil {
 		return nil, err
 	}
 
-	visitor_user, err := i.Connection.User().FindById(request.VisitorUserId)
+	visitor_user, err := i.Connection.User().FindByID(request.VisitorUserID)
 	if err != nil {
 		return nil, err
 	}
 
 	room := model.Room{
 		Name:          request.Name,
-		OwnerUserId:   owner_user.Id,
-		VisitorUserId: visitor_user.Id,
+		OwnerUserID:   owner_user.ID,
+		VisitorUserID: visitor_user.ID,
 	}
 
 	if created_room, err := i.Connection.RunTransaction(
@@ -65,7 +65,7 @@ func (i *RoomInteractor) Create(request input.CreateRoomRequest) (*output.Create
 
 func (i *RoomInteractor) Update(request input.UpdateRoomRequest) (*output.UpdateRoomResponse, error) {
 	room := model.Room{
-		Id:   request.Id,
+		ID:   request.ID,
 		Name: request.Name,
 	}
 
@@ -85,14 +85,14 @@ func (i *RoomInteractor) Update(request input.UpdateRoomRequest) (*output.Update
 	}
 }
 
-func (i *RoomInteractor) DeleteById(request input.DeleteRoomByIdRequest) error {
-	if _, err := i.Connection.Room().FindById(request.Id); err != nil {
+func (i *RoomInteractor) DeleteByID(request input.DeleteRoomByIDRequest) error {
+	if _, err := i.Connection.Room().FindByID(request.ID); err != nil {
 		return err
 	}
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Room().DeleteById(request.Id); err != nil {
+			if err := tx.Room().DeleteByID(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil

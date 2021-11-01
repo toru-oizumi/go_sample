@@ -11,9 +11,9 @@ func NewGroupPresenter() *GroupPresenter {
 	return &GroupPresenter{}
 }
 
-func (p *GroupPresenter) BuildFindByIdResponse(object *model.Group) (*output.FindGroupByIdResponse, error) {
-	return &output.FindGroupByIdResponse{
-		Id:        object.Id,
+func (p *GroupPresenter) BuildFindByIDResponse(object *model.Group) (*output.FindGroupByIDResponse, error) {
+	return &output.FindGroupByIDResponse{
+		ID:        object.ID,
 		Name:      object.Name,
 		CreatedAt: object.CreatedAt,
 		UpdatedAt: object.UpdatedAt,
@@ -25,7 +25,7 @@ func (p *GroupPresenter) BuildFindAllResponse(objects model.Groups) (output.Find
 		result = append(
 			result,
 			model.Group{
-				Id:        object.Id,
+				ID:        object.ID,
 				Name:      object.Name,
 				CreatedAt: object.CreatedAt,
 				UpdatedAt: object.UpdatedAt,
@@ -37,7 +37,7 @@ func (p *GroupPresenter) BuildFindAllResponse(objects model.Groups) (output.Find
 }
 func (p *GroupPresenter) BuildCreateResponse(object *model.Group) (*output.CreateGroupResponse, error) {
 	return &output.CreateGroupResponse{
-		Id:        object.Id,
+		ID:        object.ID,
 		Name:      object.Name,
 		CreatedAt: object.CreatedAt,
 		UpdatedAt: object.UpdatedAt,
@@ -45,7 +45,7 @@ func (p *GroupPresenter) BuildCreateResponse(object *model.Group) (*output.Creat
 }
 func (p *GroupPresenter) BuildUpdateResponse(object *model.Group) (*output.UpdateGroupResponse, error) {
 	return &output.UpdateGroupResponse{
-		Id:        object.Id,
+		ID:        object.ID,
 		Name:      object.Name,
 		CreatedAt: object.CreatedAt,
 		UpdatedAt: object.UpdatedAt,

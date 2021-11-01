@@ -4,8 +4,8 @@ import (
 	"go_sample/app/domain/model"
 )
 
-type FindGroupByIdRequest struct {
-	Id model.GroupId `param:"id" validate:"required"`
+type FindGroupByIDRequest struct {
+	ID model.GroupID `param:"id" validate:"required"`
 }
 
 type CreateGroupRequest struct {
@@ -13,10 +13,10 @@ type CreateGroupRequest struct {
 }
 
 type UpdateGroupRequest struct {
-	Id   model.GroupId   `param:"id" validate:"required"`
+	ID   model.GroupID   `param:"id" validate:"required"`
 	Name model.GroupName `json:"name" form:"name" validate:"required"`
 }
 
-type DeleteGroupByIdRequest struct {
-	Id model.GroupId `param:"id" validate:"required"`
+type DeleteGroupByIDRequest struct {
+	ID model.GroupID `param:"id" validate:"required"`
 }

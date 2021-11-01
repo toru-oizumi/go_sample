@@ -8,7 +8,7 @@ import (
 )
 
 type GroupRDBRecord struct {
-	Id        string `gorm:"type:varchar(255);primarykey"`
+	ID        string `gorm:"type:varchar(255);primarykey"`
 	Name      string `gorm:"type:varchar(255);unique;not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -21,7 +21,7 @@ func (GroupRDBRecord) TableName() string {
 
 func (r *GroupRDBRecord) ToDomain() (*model.Group, error) {
 	group := model.Group{
-		Id:        model.GroupId(r.Id),
+		ID:        model.GroupID(r.ID),
 		Name:      model.GroupName(r.Name),
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
@@ -36,7 +36,7 @@ func (r *GroupRDBRecord) ToDomain() (*model.Group, error) {
 
 func (r *GroupRDBRecord) FromDomain(d model.Group) GroupRDBRecord {
 	return GroupRDBRecord{
-		Id:        string(d.Id),
+		ID:        string(d.ID),
 		Name:      string(d.Name),
 		CreatedAt: d.CreatedAt,
 		UpdatedAt: d.UpdatedAt,

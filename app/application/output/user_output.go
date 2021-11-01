@@ -4,7 +4,7 @@ import (
 	"go_sample/app/domain/model"
 )
 
-type FindUserByIdResponse model.User
+type FindUserByIDResponse model.User
 
 type FindAllUsersResponse model.Users
 

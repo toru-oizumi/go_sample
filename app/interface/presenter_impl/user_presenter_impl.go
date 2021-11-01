@@ -11,9 +11,9 @@ func NewUserPresenter() *UserPresenter {
 	return &UserPresenter{}
 }
 
-func (p *UserPresenter) BuildFindByIdResponse(object *model.User) (*output.FindUserByIdResponse, error) {
-	return &output.FindUserByIdResponse{
-		Id:        object.Id,
+func (p *UserPresenter) BuildFindByIDResponse(object *model.User) (*output.FindUserByIDResponse, error) {
+	return &output.FindUserByIDResponse{
+		ID:        object.ID,
 		Name:      object.Name,
 		Age:       object.Age,
 		Group:     object.Group,
@@ -27,7 +27,7 @@ func (p *UserPresenter) BuildFindAllResponse(objects model.Users) (output.FindAl
 		result = append(
 			result,
 			model.User{
-				Id:        object.Id,
+				ID:        object.ID,
 				Name:      object.Name,
 				Age:       object.Age,
 				Group:     object.Group,
@@ -41,7 +41,7 @@ func (p *UserPresenter) BuildFindAllResponse(objects model.Users) (output.FindAl
 }
 func (p *UserPresenter) BuildCreateResponse(object *model.User) (*output.CreateUserResponse, error) {
 	return &output.CreateUserResponse{
-		Id:        object.Id,
+		ID:        object.ID,
 		Name:      object.Name,
 		Age:       object.Age,
 		Group:     object.Group,
@@ -51,7 +51,7 @@ func (p *UserPresenter) BuildCreateResponse(object *model.User) (*output.CreateU
 }
 func (p *UserPresenter) BuildUpdateResponse(object *model.User) (*output.UpdateUserResponse, error) {
 	return &output.UpdateUserResponse{
-		Id:        object.Id,
+		ID:        object.ID,
 		Name:      object.Name,
 		Age:       object.Age,
 		Group:     object.Group,

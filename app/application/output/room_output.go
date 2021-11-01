@@ -4,7 +4,7 @@ import (
 	"go_sample/app/domain/model"
 )
 
-type FindRoomByIdResponse model.Room
+type FindRoomByIDResponse model.Room
 
 type FindAllRoomsResponse model.Rooms
 

@@ -6,14 +6,14 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type UserId string
+type UserID string
 
 type UserName string
 
 type UserAge uint
 
 type User struct {
-	Id        UserId   `validate:"required"`
+	ID        UserID   `validate:"required"`
 	Name      UserName `validate:"required"`
 	Age       UserAge  `validate:"required,gte=0,lt=200"`
 	Group     Group

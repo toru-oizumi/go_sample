@@ -13,11 +13,11 @@ type UserInteractor struct {
 	Presenter  presenter.UserPresenter
 }
 
-func (i *UserInteractor) FindById(request input.FindUserByIdRequest) (*output.FindUserByIdResponse, error) {
-	if user, err := i.Connection.User().FindById(request.Id); err != nil {
+func (i *UserInteractor) FindByID(request input.FindUserByIDRequest) (*output.FindUserByIDResponse, error) {
+	if user, err := i.Connection.User().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindByIdResponse(user)
+		return i.Presenter.BuildFindByIDResponse(user)
 	}
 }
 
@@ -30,7 +30,7 @@ func (i *UserInteractor) FindAll() (output.FindAllUsersResponse, error) {
 }
 
 func (i *UserInteractor) Create(request input.CreateUserRequest) (*output.CreateUserResponse, error) {
-	group, err := i.Connection.Group().FindById(request.GroupId)
+	group, err := i.Connection.Group().FindByID(request.GroupID)
 	if err != nil {
 		return nil, err
 	}
@@ -59,13 +59,13 @@ func (i *UserInteractor) Create(request input.CreateUserRequest) (*output.Create
 }
 
 func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.UpdateUserResponse, error) {
-	group, err := i.Connection.Group().FindById(request.GroupId)
+	group, err := i.Connection.Group().FindByID(request.GroupID)
 	if err != nil {
 		return nil, err
 	}
 
 	user := model.User{
-		Id:    request.Id,
+		ID:    request.ID,
 		Name:  request.Name,
 		Age:   request.Age,
 		Group: *group,
@@ -87,14 +87,14 @@ func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.Update
 	}
 }
 
-func (i *UserInteractor) DeleteById(request input.DeleteUserByIdRequest) error {
-	if _, err := i.Connection.User().FindById(request.Id); err != nil {
+func (i *UserInteractor) DeleteByID(request input.DeleteUserByIDRequest) error {
+	if _, err := i.Connection.User().FindByID(request.ID); err != nil {
 		return err
 	}
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.User().DeleteById(request.Id); err != nil {
+			if err := tx.User().DeleteByID(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil

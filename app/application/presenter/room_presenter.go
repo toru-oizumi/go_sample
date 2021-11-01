@@ -6,7 +6,7 @@ import (
 )
 
 type RoomPresenter interface {
-	BuildFindByIdResponse(object *model.Room) (*output.FindRoomByIdResponse, error)
+	BuildFindByIDResponse(object *model.Room) (*output.FindRoomByIDResponse, error)
 	BuildFindAllResponse(objects model.Rooms) (output.FindAllRoomsResponse, error)
 	BuildCreateResponse(object *model.Room) (*output.CreateRoomResponse, error)
 	BuildUpdateResponse(object *model.Room) (*output.UpdateRoomResponse, error)

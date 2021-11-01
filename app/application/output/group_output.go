@@ -4,7 +4,7 @@ import (
 	"go_sample/app/domain/model"
 )
 
-type FindGroupByIdResponse model.Group
+type FindGroupByIDResponse model.Group
 
 type FindAllGroupsResponse model.Groups
 

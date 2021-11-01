@@ -6,15 +6,15 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type RoomId string
+type RoomID string
 
 type RoomName string
 
 type Room struct {
-	Id            RoomId `validate:"required"`
+	ID            RoomID `validate:"required"`
 	Name          RoomName
-	OwnerUserId   UserId    `validate:"required"`
-	VisitorUserId UserId    `validate:"required"`
+	OwnerUserID   UserID    `validate:"required"`
+	VisitorUserID UserID    `validate:"required"`
 	CreatedAt     time.Time `validate:"required"`
 	UpdatedAt     time.Time `validate:"required"`
 }

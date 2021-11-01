@@ -25,7 +25,7 @@ type PlayRequest struct {
 func (handler *PlayWsHandler) Handle(c echo.Context) error {
 	id := c.Param("id")
 	// user_idはCognito（というかJWT）から取得する想定
-	user_id := model.UserId(c.QueryParam("user_id"))
+	user_id := model.UserID(c.QueryParam("user_id"))
 
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {

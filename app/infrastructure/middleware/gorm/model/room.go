@@ -8,12 +8,12 @@ import (
 )
 
 type RoomRDBRecord struct {
-	Id            string `gorm:"type:varchar(255);primarykey"`
+	ID            string `gorm:"type:varchar(255);primarykey"`
 	Name          string `gorm:"type:varchar(255);unique;not null"`
-	OwnerUserId   string
-	OwnerUser     UserRDBRecord `gorm:"foreignKey:OwnerUserId"`
-	VisitorUserId string
-	VisitorUser   UserRDBRecord `gorm:"foreignKey:VisitorUserId"`
+	OwnerUserID   string
+	OwnerUser     UserRDBRecord `gorm:"foreignKey:OwnerUserID"`
+	VisitorUserID string
+	VisitorUser   UserRDBRecord `gorm:"foreignKey:VisitorUserID"`
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
@@ -25,10 +25,10 @@ func (RoomRDBRecord) TableName() string {
 
 func (r *RoomRDBRecord) ToDomain() (*model.Room, error) {
 	group := model.Room{
-		Id:            model.RoomId(r.Id),
+		ID:            model.RoomID(r.ID),
 		Name:          model.RoomName(r.Name),
-		OwnerUserId:   model.UserId(r.OwnerUserId),
-		VisitorUserId: model.UserId(r.VisitorUserId),
+		OwnerUserID:   model.UserID(r.OwnerUserID),
+		VisitorUserID: model.UserID(r.VisitorUserID),
 		CreatedAt:     r.CreatedAt,
 		UpdatedAt:     r.UpdatedAt,
 	}
@@ -42,10 +42,10 @@ func (r *RoomRDBRecord) ToDomain() (*model.Room, error) {
 
 func (r *RoomRDBRecord) FromDomain(d model.Room) RoomRDBRecord {
 	return RoomRDBRecord{
-		Id:            string(d.Id),
+		ID:            string(d.ID),
 		Name:          string(d.Name),
-		OwnerUserId:   string(d.OwnerUserId),
-		VisitorUserId: string(d.VisitorUserId),
+		OwnerUserID:   string(d.OwnerUserID),
+		VisitorUserID: string(d.VisitorUserID),
 		CreatedAt:     d.CreatedAt,
 		UpdatedAt:     d.UpdatedAt,
 	}
