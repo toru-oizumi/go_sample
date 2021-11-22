@@ -4,19 +4,23 @@ import (
 	"go_sample/app/application/input"
 	"go_sample/app/application/usecase"
 	"go_sample/app/interface/controller/context"
-	"go_sample/app/interface/controller/logger"
+	"go_sample/app/interface/gateway/logger"
 	"net/http"
 )
 
 type PlayController struct {
 	Usecase usecase.PlayUsecase
-	Logger  logger.Logger
+	Logger  logger.RestApiLogger
 }
 
 func (ctrl *PlayController) Find(c context.Context) error {
 	request := new(input.FindPlayByIDRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
 	if user, err := ctrl.Usecase.FindByID(*request); err != nil {
@@ -36,8 +40,12 @@ func (ctrl *PlayController) FindAll(c context.Context) error {
 
 func (ctrl *PlayController) Create(c context.Context) error {
 	request := new(input.CreatePlayRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
 	if user, err := ctrl.Usecase.Create(*request); err != nil {
@@ -49,8 +57,12 @@ func (ctrl *PlayController) Create(c context.Context) error {
 
 func (ctrl *PlayController) Update(c context.Context) error {
 	request := new(input.UpdatePlayRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
 	if user, err := ctrl.Usecase.Update(*request); err != nil {
@@ -61,12 +73,16 @@ func (ctrl *PlayController) Update(c context.Context) error {
 }
 
 func (ctrl *PlayController) Delete(c context.Context) error {
-	request := new(input.DeletePlayByIDRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+	request := new(input.DeletePlayRequest)
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
-	if err := ctrl.Usecase.DeleteByID(*request); err != nil {
+	if err := ctrl.Usecase.Delete(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusNoContent, nil)

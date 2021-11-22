@@ -13,44 +13,80 @@ type GroupInteractor struct {
 	Presenter  presenter.GroupPresenter
 }
 
-func (i *GroupInteractor) FindByID(request input.FindGroupByIDRequest) (*output.FindGroupByIDResponse, error) {
+func (i *GroupInteractor) FindByID(request input.FindGroupByIDRequest) (*output.GroupResponse, error) {
 	if group, err := i.Connection.Group().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindByIDResponse(group)
+		return i.Presenter.BuildGroupResponse(*group)
 	}
 }
 
-func (i *GroupInteractor) FindAll() (output.FindAllGroupsResponse, error) {
-	if groups, err := i.Connection.Group().List(repository.GroupFilter{UserID: model.UserID("1")}); err != nil {
+func (i *GroupInteractor) FindList(request input.FindGroupsRequest) ([]output.GroupResponse, error) {
+	filter := repository.GroupFilter{
+		NameLike: request.NameLike,
+	}
+	if users, err := i.Connection.Group().List(filter); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindAllResponse(groups)
+		return i.Presenter.BuildGroupsResponse(users)
 	}
 }
 
-func (i *GroupInteractor) Create(request input.CreateGroupRequest) (*output.CreateGroupResponse, error) {
+func (i *GroupInteractor) FindAll() ([]output.GroupResponse, error) {
+	if groups, err := i.Connection.Group().List(repository.GroupFilter{}); err != nil {
+		return nil, err
+	} else {
+		return i.Presenter.BuildGroupsResponse(groups)
+	}
+}
+
+func (i *GroupInteractor) Create(request input.CreateGroupRequest) (*output.GroupResponse, error) {
+	// TODO: Groupに所属していない場合しか作成できない
 	group := model.Group{
 		Name: request.Name,
 	}
 
 	if created_group, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if created_group, err := tx.Group().Store(group); err != nil {
+			// Group作成
+			created_group, err := tx.Group().Store(group)
+			if err != nil {
 				return nil, err
-			} else {
-				return created_group, nil
 			}
+
+			// Userの取得
+			// ChatのMembersに設定するUserIDの存在確認も兼ねて、先に取得する
+			user, err := tx.User().FindByID(request.UserID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Group向けchatを作成
+			chat := model.Chat{
+				Name:    model.ChatName(request.Name),
+				Members: []model.UserID{request.UserID},
+			}
+			if _, err := tx.Chat().Store(chat); err != nil {
+				return nil, err
+			}
+
+			// userのGroupを書き換え
+			user.Group = *created_group
+			if _, err := tx.User().Update(*user); err != nil {
+				return nil, err
+			}
+
+			return created_group, nil
 		},
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_group, _ := created_group.(*model.Group)
-		return i.Presenter.BuildCreateResponse(parsed_group)
+		parsed_group, _ := created_group.(model.Group)
+		return i.Presenter.BuildGroupResponse(parsed_group)
 	}
 }
 
-func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.UpdateGroupResponse, error) {
+func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.GroupResponse, error) {
 	group := model.Group{
 		ID:   request.ID,
 		Name: request.Name,
@@ -67,22 +103,24 @@ func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.Upda
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_group, _ := updated_group.(*model.Group)
-		return i.Presenter.BuildUpdateResponse(parsed_group)
+		parsed_group, _ := updated_group.(model.Group)
+		return i.Presenter.BuildGroupResponse(parsed_group)
 	}
 }
 
-func (i *GroupInteractor) DeleteByID(request input.DeleteGroupByIDRequest) error {
+func (i *GroupInteractor) Delete(request input.DeleteGroupRequest) error {
 	if _, err := i.Connection.Group().FindByID(request.ID); err != nil {
 		return err
 	}
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Group().DeleteByID(request.ID); err != nil {
+			if err := tx.Group().Delete(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil
 			}
+
+			// TODO: Group向けChatの削除
 		},
 	); err != nil {
 		return err

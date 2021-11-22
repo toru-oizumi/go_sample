@@ -4,26 +4,25 @@ import (
 	"errors"
 	"fmt"
 	"go_sample/app/domain/model"
+	"go_sample/app/domain/repository"
+	db_model "go_sample/app/infrastructure/middleware/gorm/model"
+	"go_sample/app/interface/gateway/db"
+	"go_sample/app/utility"
 	util_error "go_sample/app/utility/error"
 
-	"go_sample/app/domain/repository"
-	"go_sample/app/utility"
-
-	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-
-	db_model "go_sample/app/infrastructure/middleware/gorm/model"
 )
 
 type UserRepository struct {
-	Db *gorm.DB
+	DB      *gorm.DB
+	Service db.DBService
 }
 
 func (repo *UserRepository) FindByID(id model.UserID) (*model.User, error) {
 	var db_user db_model.UserRDBRecord
 
-	if err := repo.Db.Joins("Group").Take(
+	if err := repo.DB.Joins("Group").Take(
 		&db_user,
 		fmt.Sprintf("`%s`.`id` = ?", db_user.TableName()),
 		string(id),
@@ -41,12 +40,26 @@ func (repo *UserRepository) FindByID(id model.UserID) (*model.User, error) {
 	}
 }
 
-func (repo *UserRepository) List(filter repository.UserFilter) (model.Users, error) {
+func (repo *UserRepository) List(filter repository.UserFilter) ([]model.User, error) {
 	var db_users []db_model.UserRDBRecord
-	var users model.Users
+	var users []model.User
 
-	if err := repo.Db.Joins("Group").Find(&db_users).Error; err != nil {
-		return nil, err
+	query := repo.DB.Joins("Group")
+
+	if len(filter.GroupID) != 0 {
+		query = query.Where("`group_id` = ?", filter.GroupID)
+	}
+
+	if len(filter.NameLike) != 0 {
+		query = query.Where("`users`.`name` LIKE ?", fmt.Sprintf("%%%s%%", filter.NameLike))
+	}
+
+	if err := query.Find(&db_users).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return []model.User{}, nil
+		} else {
+			return nil, err
+		}
 	} else {
 		for _, v := range db_users {
 			if user, err := v.ToDomain(); err != nil {
@@ -64,15 +77,12 @@ func (repo *UserRepository) Store(object model.User) (*model.User, error) {
 	db_user = db_user.FromDomain(object)
 	db_user.ID = utility.GetUlid()
 
-	if err := repo.Db.Create(&db_user).Error; err != nil {
-		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
-		// DBがMySQLの場合
-		mysqlErr := err.(*mysql.MySQLError)
-		switch mysqlErr.Number {
-		case 1062:
+	if err := repo.DB.Create(&db_user).Error; err != nil {
+		if repo.Service.IsDuplicateError(err) {
 			return nil, util_error.NewErrRecordDuplicate()
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
 	if user, err := repo.FindByID(model.UserID(db_user.ID)); err != nil {
@@ -85,7 +95,7 @@ func (repo *UserRepository) Store(object model.User) (*model.User, error) {
 func (repo *UserRepository) Update(object model.User) (*model.User, error) {
 	var db_user db_model.UserRDBRecord
 
-	if err := repo.Db.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_user, string(object.ID)).Error; err != nil {
+	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_user, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
 		}
@@ -95,15 +105,12 @@ func (repo *UserRepository) Update(object model.User) (*model.User, error) {
 	db_user.Age = uint(object.Age)
 	db_user.GroupID = string(object.Group.ID)
 
-	if err := repo.Db.Save(&db_user).Error; err != nil {
-		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
-		// DBがMySQLの場合
-		mysqlErr := err.(*mysql.MySQLError)
-		switch mysqlErr.Number {
-		case 1062:
+	if err := repo.DB.Save(&db_user).Error; err != nil {
+		if repo.Service.IsDuplicateError(err) {
 			return nil, util_error.NewErrRecordDuplicate()
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
 	if user, err := repo.FindByID(model.UserID(db_user.ID)); err != nil {
@@ -113,16 +120,16 @@ func (repo *UserRepository) Update(object model.User) (*model.User, error) {
 	}
 }
 
-func (repo *UserRepository) DeleteByID(id model.UserID) error {
+func (repo *UserRepository) Delete(id model.UserID) error {
 	var db_user db_model.UserRDBRecord
-	if err := repo.Db.Take(&db_user, string(id)).Error; err != nil {
+	if err := repo.DB.Take(&db_user, string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return util_error.NewErrRecordNotFound()
 		}
 		return err
 	}
 
-	if err := repo.Db.Delete(&db_user).Error; err != nil {
+	if err := repo.DB.Delete(&db_user).Error; err != nil {
 		return err
 	}
 

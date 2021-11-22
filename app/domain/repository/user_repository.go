@@ -6,16 +6,17 @@ import (
 
 type UserQuery interface {
 	FindByID(id model.UserID) (*model.User, error)
-	List(filter UserFilter) (model.Users, error)
+	List(filter UserFilter) ([]model.User, error)
 }
 
 type UserCommand interface {
 	UserQuery
 	Store(object model.User) (*model.User, error)
 	Update(object model.User) (*model.User, error)
-	DeleteByID(id model.UserID) error
+	Delete(id model.UserID) error
 }
 
 type UserFilter struct {
 	NameLike string
+	GroupID  model.GroupID
 }

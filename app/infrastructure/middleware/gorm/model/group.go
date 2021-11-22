@@ -8,11 +8,12 @@ import (
 )
 
 type GroupRDBRecord struct {
-	ID        string `gorm:"type:varchar(255);primarykey"`
-	Name      string `gorm:"type:varchar(255);unique;not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID              string `gorm:"type:varchar(255);primarykey"`
+	Name            string `gorm:"type:varchar(255);unique;not null"`
+	NumberOfMembers uint   `gorm:"not null"`
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       gorm.DeletedAt `gorm:"index"`
 }
 
 func (GroupRDBRecord) TableName() string {
@@ -21,10 +22,11 @@ func (GroupRDBRecord) TableName() string {
 
 func (r *GroupRDBRecord) ToDomain() (*model.Group, error) {
 	group := model.Group{
-		ID:        model.GroupID(r.ID),
-		Name:      model.GroupName(r.Name),
-		CreatedAt: r.CreatedAt,
-		UpdatedAt: r.UpdatedAt,
+		ID:              model.GroupID(r.ID),
+		Name:            model.GroupName(r.Name),
+		NumberOfMembers: model.GroupNumberOfMembers(r.NumberOfMembers),
+		CreatedAt:       r.CreatedAt,
+		UpdatedAt:       r.UpdatedAt,
 	}
 
 	err := group.Validate()
@@ -36,9 +38,10 @@ func (r *GroupRDBRecord) ToDomain() (*model.Group, error) {
 
 func (r *GroupRDBRecord) FromDomain(d model.Group) GroupRDBRecord {
 	return GroupRDBRecord{
-		ID:        string(d.ID),
-		Name:      string(d.Name),
-		CreatedAt: d.CreatedAt,
-		UpdatedAt: d.UpdatedAt,
+		ID:              string(d.ID),
+		Name:            string(d.Name),
+		NumberOfMembers: uint(d.NumberOfMembers),
+		CreatedAt:       d.CreatedAt,
+		UpdatedAt:       d.UpdatedAt,
 	}
 }

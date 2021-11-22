@@ -2,7 +2,7 @@ package handler
 
 import (
 	"go_sample/app/domain/repository"
-	"go_sample/app/interface/controller/logger"
+	"go_sample/app/interface/gateway/logger"
 
 	"github.com/gorilla/websocket"
 )
@@ -13,12 +13,12 @@ var (
 
 type WsHandler struct {
 	connection repository.Connection
-	logger     logger.Logger
+	logger     logger.WsApiLogger
 }
 
 func NewWsHandler(
 	connection repository.Connection,
-	logger logger.Logger,
+	logger logger.WsApiLogger,
 ) *WsHandler {
 	return &WsHandler{
 		connection: connection,

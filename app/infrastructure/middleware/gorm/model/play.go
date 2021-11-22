@@ -20,7 +20,7 @@ type PlayRDBRecord struct {
 }
 
 func (PlayRDBRecord) TableName() string {
-	return "rooms"
+	return "plays"
 }
 
 func (r *PlayRDBRecord) ToDomain() (*model.Play, error) {

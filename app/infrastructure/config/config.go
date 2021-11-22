@@ -7,11 +7,11 @@ import (
 )
 
 type Config struct {
-	DbUser     string `required:"true" split_words:"true"`
-	DbPassword string `required:"true" split_words:"true"`
-	DbHost     string `required:"true" split_words:"true"`
-	DbPort     string `required:"true" split_words:"true"`
-	DbName     string `required:"true" split_words:"true"`
+	DBUser     string `required:"true" split_words:"true"`
+	DBPassword string `required:"true" split_words:"true"`
+	DBHost     string `required:"true" split_words:"true"`
+	DBPort     string `required:"true" split_words:"true"`
+	DBName     string `required:"true" split_words:"true"`
 }
 
 func LoadConfig() Config {

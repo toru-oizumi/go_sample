@@ -7,47 +7,37 @@ import (
 
 type GroupPresenter struct{}
 
-func NewGroupPresenter() *GroupPresenter {
-	return &GroupPresenter{}
+func NewGroupPresenter() GroupPresenter {
+	return GroupPresenter{}
 }
 
-func (p *GroupPresenter) BuildFindByIDResponse(object *model.Group) (*output.FindGroupByIDResponse, error) {
-	return &output.FindGroupByIDResponse{
-		ID:        object.ID,
-		Name:      object.Name,
-		CreatedAt: object.CreatedAt,
-		UpdatedAt: object.UpdatedAt,
+func (p GroupPresenter) BuildGroupResponse(object model.Group) (*output.GroupResponse, error) {
+	return &output.GroupResponse{
+		ID:              object.ID,
+		Name:            object.Name,
+		NumberOfMembers: object.NumberOfMembers,
+		CreatedAt:       object.CreatedAt,
+		UpdatedAt:       object.UpdatedAt,
 	}, nil
 }
-func (p *GroupPresenter) BuildFindAllResponse(objects model.Groups) (output.FindAllGroupsResponse, error) {
-	var result output.FindAllGroupsResponse
+
+func (p GroupPresenter) BuildGroupsResponse(objects []model.Group) ([]output.GroupResponse, error) {
+	if objects == nil {
+		return []output.GroupResponse{}, nil
+	}
+
+	var result []output.GroupResponse
 	for _, object := range objects {
 		result = append(
 			result,
-			model.Group{
-				ID:        object.ID,
-				Name:      object.Name,
-				CreatedAt: object.CreatedAt,
-				UpdatedAt: object.UpdatedAt,
+			output.GroupResponse{
+				ID:              object.ID,
+				Name:            object.Name,
+				NumberOfMembers: object.NumberOfMembers,
+				CreatedAt:       object.CreatedAt,
+				UpdatedAt:       object.UpdatedAt,
 			},
 		)
 	}
-
 	return result, nil
-}
-func (p *GroupPresenter) BuildCreateResponse(object *model.Group) (*output.CreateGroupResponse, error) {
-	return &output.CreateGroupResponse{
-		ID:        object.ID,
-		Name:      object.Name,
-		CreatedAt: object.CreatedAt,
-		UpdatedAt: object.UpdatedAt,
-	}, nil
-}
-func (p *GroupPresenter) BuildUpdateResponse(object *model.Group) (*output.UpdateGroupResponse, error) {
-	return &output.UpdateGroupResponse{
-		ID:        object.ID,
-		Name:      object.Name,
-		CreatedAt: object.CreatedAt,
-		UpdatedAt: object.UpdatedAt,
-	}, nil
 }

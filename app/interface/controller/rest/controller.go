@@ -3,18 +3,18 @@ package controller
 import (
 	"go_sample/app/application/interactor"
 	"go_sample/app/domain/repository"
-	"go_sample/app/interface/controller/logger"
+	"go_sample/app/interface/gateway/logger"
 	"go_sample/app/interface/presenter_impl"
 )
 
 type Controller struct {
 	connection repository.Connection
-	logger     logger.Logger
+	logger     logger.RestApiLogger
 }
 
 func NewController(
 	connection repository.Connection,
-	logger logger.Logger,
+	logger logger.RestApiLogger,
 ) *Controller {
 	return &Controller{
 		connection: connection,
@@ -47,6 +47,16 @@ func (c *Controller) Play() *PlayController {
 		Usecase: &interactor.PlayInteractor{
 			Connection: c.connection,
 			Presenter:  presenter_impl.NewPlayPresenter(),
+		},
+		Logger: c.logger,
+	}
+}
+
+func (c *Controller) Chat() *ChatController {
+	return &ChatController{
+		Usecase: &interactor.ChatInteractor{
+			Connection: c.connection,
+			Presenter:  presenter_impl.NewChatPresenter(),
 		},
 		Logger: c.logger,
 	}

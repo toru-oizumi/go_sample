@@ -23,5 +23,3 @@ func (m *Play) Validate() error {
 	validate := validator.New()
 	return validate.Struct(m)
 }
-
-type Plays []Play

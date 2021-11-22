@@ -15,7 +15,7 @@ type UserAge uint
 type User struct {
 	ID        UserID   `validate:"required"`
 	Name      UserName `validate:"required"`
-	Age       UserAge  `validate:"required,gte=0,lt=200"`
+	Age       UserAge  `validate:"numeric,gte=0,lt=200"`
 	Group     Group
 	CreatedAt time.Time `validate:"required"`
 	UpdatedAt time.Time `validate:"required"`
@@ -25,5 +25,3 @@ func (m *User) Validate() error {
 	validate := validator.New()
 	return validate.Struct(m)
 }
-
-type Users []User

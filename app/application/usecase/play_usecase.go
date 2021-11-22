@@ -6,9 +6,9 @@ import (
 )
 
 type PlayUsecase interface {
-	FindByID(request input.FindPlayByIDRequest) (*output.FindPlayByIDResponse, error)
-	FindAll() (output.FindAllPlaysResponse, error)
-	Create(request input.CreatePlayRequest) (*output.CreatePlayResponse, error)
-	Update(request input.UpdatePlayRequest) (*output.UpdatePlayResponse, error)
-	DeleteByID(request input.DeletePlayByIDRequest) error
+	FindByID(request input.FindPlayByIDRequest) (*output.PlayResponse, error)
+	FindAll() ([]output.PlayResponse, error)
+	Create(request input.CreatePlayRequest) (*output.PlayResponse, error)
+	Update(request input.UpdatePlayRequest) (*output.PlayResponse, error)
+	Delete(request input.DeletePlayRequest) error
 }

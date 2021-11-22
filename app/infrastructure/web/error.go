@@ -5,16 +5,12 @@ import (
 	"net/http"
 )
 
-type errorMessage struct {
-	Message string
-}
-
 type ApiError struct {
-	HttpStatusCode int
-	Error          errorMessage
+	StatusCode int
+	Message    string
 }
 
-func NewApiError(err error) *ApiError {
+func NewApiError(err error) ApiError {
 	var httpStatusCode int
 	switch err.(type) {
 	case *util_error.ErrValidationError:
@@ -27,8 +23,8 @@ func NewApiError(err error) *ApiError {
 		httpStatusCode = http.StatusInternalServerError
 	}
 
-	return &ApiError{
-		HttpStatusCode: httpStatusCode,
-		Error:          errorMessage{Message: err.Error()},
+	return ApiError{
+		StatusCode: httpStatusCode,
+		Message:    err.Error(),
 	}
 }

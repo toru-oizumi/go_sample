@@ -1,14 +1,14 @@
 package router
 
 import (
-	"go_sample/app/interface/controller"
+	rest_controller "go_sample/app/interface/controller/rest"
 
 	"go_sample/app/infrastructure/middleware/echo/context"
 
 	"github.com/labstack/echo/v4"
 )
 
-func AddPlaysRoutingGroup(e *echo.Echo, ctrl *controller.Controller) {
+func AddPlaysRoutingGroup(e *echo.Echo, ctrl *rest_controller.Controller) {
 	plays := e.Group("plays")
 	{
 		plays.GET("", func(c echo.Context) error { return ctrl.Play().FindAll(c.(*context.CustomContext)) })

@@ -7,12 +7,12 @@ import (
 
 type PlayPresenter struct{}
 
-func NewPlayPresenter() *PlayPresenter {
-	return &PlayPresenter{}
+func NewPlayPresenter() PlayPresenter {
+	return PlayPresenter{}
 }
 
-func (p *PlayPresenter) BuildFindByIDResponse(object *model.Play) (*output.FindPlayByIDResponse, error) {
-	return &output.FindPlayByIDResponse{
+func (p PlayPresenter) BuildPlayResponse(object model.Play) (*output.PlayResponse, error) {
+	return &output.PlayResponse{
 		ID:            object.ID,
 		Name:          object.Name,
 		OwnerUserID:   object.OwnerUserID,
@@ -21,12 +21,17 @@ func (p *PlayPresenter) BuildFindByIDResponse(object *model.Play) (*output.FindP
 		UpdatedAt:     object.UpdatedAt,
 	}, nil
 }
-func (p *PlayPresenter) BuildFindAllResponse(objects model.Plays) (output.FindAllPlaysResponse, error) {
-	var result output.FindAllPlaysResponse
+
+func (p PlayPresenter) BuildPlaysResponse(objects []model.Play) ([]output.PlayResponse, error) {
+	if objects == nil {
+		return []output.PlayResponse{}, nil
+	}
+
+	var result []output.PlayResponse
 	for _, object := range objects {
 		result = append(
 			result,
-			model.Play{
+			output.PlayResponse{
 				ID:            object.ID,
 				Name:          object.Name,
 				OwnerUserID:   object.OwnerUserID,
@@ -36,26 +41,5 @@ func (p *PlayPresenter) BuildFindAllResponse(objects model.Plays) (output.FindAl
 			},
 		)
 	}
-
 	return result, nil
-}
-func (p *PlayPresenter) BuildCreateResponse(object *model.Play) (*output.CreatePlayResponse, error) {
-	return &output.CreatePlayResponse{
-		ID:            object.ID,
-		Name:          object.Name,
-		OwnerUserID:   object.OwnerUserID,
-		VisitorUserID: object.VisitorUserID,
-		CreatedAt:     object.CreatedAt,
-		UpdatedAt:     object.UpdatedAt,
-	}, nil
-}
-func (p *PlayPresenter) BuildUpdateResponse(object *model.Play) (*output.UpdatePlayResponse, error) {
-	return &output.UpdatePlayResponse{
-		ID:            object.ID,
-		Name:          object.Name,
-		OwnerUserID:   object.OwnerUserID,
-		VisitorUserID: object.VisitorUserID,
-		CreatedAt:     object.CreatedAt,
-		UpdatedAt:     object.UpdatedAt,
-	}, nil
 }

@@ -8,8 +8,13 @@ type FindGroupByIDRequest struct {
 	ID model.GroupID `param:"id" validate:"required"`
 }
 
+type FindGroupsRequest struct {
+	NameLike string `query:"nameLike" validate:"required,omitempty,alphanum"`
+}
+
 type CreateGroupRequest struct {
-	Name model.GroupName `json:"name" form:"name" validate:"required"`
+	UserID model.UserID    `param:"userID" validate:"required"`
+	Name   model.GroupName `json:"name" form:"name" validate:"required"`
 }
 
 type UpdateGroupRequest struct {
@@ -17,6 +22,6 @@ type UpdateGroupRequest struct {
 	Name model.GroupName `json:"name" form:"name" validate:"required"`
 }
 
-type DeleteGroupByIDRequest struct {
+type DeleteGroupRequest struct {
 	ID model.GroupID `param:"id" validate:"required"`
 }

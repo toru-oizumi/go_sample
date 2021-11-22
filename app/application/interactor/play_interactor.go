@@ -13,23 +13,23 @@ type PlayInteractor struct {
 	Presenter  presenter.PlayPresenter
 }
 
-func (i *PlayInteractor) FindByID(request input.FindPlayByIDRequest) (*output.FindPlayByIDResponse, error) {
+func (i *PlayInteractor) FindByID(request input.FindPlayByIDRequest) (*output.PlayResponse, error) {
 	if room, err := i.Connection.Play().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindByIDResponse(room)
+		return i.Presenter.BuildPlayResponse(*room)
 	}
 }
 
-func (i *PlayInteractor) FindAll() (output.FindAllPlaysResponse, error) {
+func (i *PlayInteractor) FindAll() ([]output.PlayResponse, error) {
 	if rooms, err := i.Connection.Play().List(repository.PlayFilter{PlayID: ""}); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindAllResponse(rooms)
+		return i.Presenter.BuildPlaysResponse(rooms)
 	}
 }
 
-func (i *PlayInteractor) Create(request input.CreatePlayRequest) (*output.CreatePlayResponse, error) {
+func (i *PlayInteractor) Create(request input.CreatePlayRequest) (*output.PlayResponse, error) {
 	owner_user, err := i.Connection.User().FindByID(request.OwnerUserID)
 	if err != nil {
 		return nil, err
@@ -57,13 +57,13 @@ func (i *PlayInteractor) Create(request input.CreatePlayRequest) (*output.Create
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_room, _ := created_room.(*model.Play)
-		return i.Presenter.BuildCreateResponse(parsed_room)
+		parsed_room, _ := created_room.(model.Play)
+		return i.Presenter.BuildPlayResponse(parsed_room)
 	}
 
 }
 
-func (i *PlayInteractor) Update(request input.UpdatePlayRequest) (*output.UpdatePlayResponse, error) {
+func (i *PlayInteractor) Update(request input.UpdatePlayRequest) (*output.PlayResponse, error) {
 	room := model.Play{
 		ID:   request.ID,
 		Name: request.Name,
@@ -80,19 +80,19 @@ func (i *PlayInteractor) Update(request input.UpdatePlayRequest) (*output.Update
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_room, _ := updated_room.(*model.Play)
-		return i.Presenter.BuildUpdateResponse(parsed_room)
+		parsed_room, _ := updated_room.(model.Play)
+		return i.Presenter.BuildPlayResponse(parsed_room)
 	}
 }
 
-func (i *PlayInteractor) DeleteByID(request input.DeletePlayByIDRequest) error {
+func (i *PlayInteractor) Delete(request input.DeletePlayRequest) error {
 	if _, err := i.Connection.Play().FindByID(request.ID); err != nil {
 		return err
 	}
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Play().DeleteByID(request.ID); err != nil {
+			if err := tx.Play().Delete(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil

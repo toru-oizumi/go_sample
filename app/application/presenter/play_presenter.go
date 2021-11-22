@@ -6,8 +6,6 @@ import (
 )
 
 type PlayPresenter interface {
-	BuildFindByIDResponse(object *model.Play) (*output.FindPlayByIDResponse, error)
-	BuildFindAllResponse(objects model.Plays) (output.FindAllPlaysResponse, error)
-	BuildCreateResponse(object *model.Play) (*output.CreatePlayResponse, error)
-	BuildUpdateResponse(object *model.Play) (*output.UpdatePlayResponse, error)
+	BuildPlayResponse(object model.Play) (*output.PlayResponse, error)
+	BuildPlaysResponse(objects []model.Play) ([]output.PlayResponse, error)
 }

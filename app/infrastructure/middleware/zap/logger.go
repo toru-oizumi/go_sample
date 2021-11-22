@@ -10,6 +10,7 @@ func NewZapLogger() *ZapLogger {
 	logger, _ := zap.NewDevelopment()
 	return &ZapLogger{Logger: logger}
 }
+
 func (l *ZapLogger) Debug(args ...interface{}) error {
 	logger := l.Logger
 	defer logger.Sync()
@@ -24,6 +25,7 @@ func (l *ZapLogger) Debug(args ...interface{}) error {
 	)
 	return nil
 }
+
 func (l *ZapLogger) Info(args ...interface{}) error {
 	logger := l.Logger
 	defer logger.Sync()
@@ -38,6 +40,7 @@ func (l *ZapLogger) Info(args ...interface{}) error {
 	)
 	return nil
 }
+
 func (l *ZapLogger) Warning(args ...interface{}) error {
 	logger := l.Logger
 	defer logger.Sync()
@@ -52,6 +55,7 @@ func (l *ZapLogger) Warning(args ...interface{}) error {
 	)
 	return nil
 }
+
 func (l *ZapLogger) Error(args ...interface{}) error {
 	logger := l.Logger
 	defer logger.Sync()
@@ -65,6 +69,7 @@ func (l *ZapLogger) Error(args ...interface{}) error {
 	)
 	return nil
 }
+
 func (l *ZapLogger) Fatal(args ...interface{}) error {
 	logger := l.Logger
 	defer logger.Sync()

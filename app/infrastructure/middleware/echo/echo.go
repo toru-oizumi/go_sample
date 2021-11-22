@@ -1,16 +1,17 @@
 package echo
 
 import (
+	rest_router "go_sample/app/infrastructure/middleware/echo/router/rest"
 	ws_router "go_sample/app/infrastructure/middleware/echo/router/ws"
 
+	mysql_service "go_sample/app/infrastructure/middleware/db/mysql"
 	"go_sample/app/infrastructure/middleware/echo/context"
-	"go_sample/app/infrastructure/middleware/echo/router"
 	"go_sample/app/infrastructure/middleware/gorm"
 	"go_sample/app/infrastructure/middleware/gorm/mysql"
 	"go_sample/app/infrastructure/middleware/validator"
 	"go_sample/app/infrastructure/middleware/zap"
 
-	rest_controller "go_sample/app/interface/controller"
+	rest_controller "go_sample/app/interface/controller/rest"
 	ws_handler "go_sample/app/interface/controller/ws"
 
 	"github.com/labstack/echo/v4"
@@ -27,14 +28,23 @@ func Init() {
 
 	e.Validator = validator.NewCustomValidator()
 
-	db := mysql.NewDb()
-	repository := gorm.NewRepository(db)
+	db := mysql.NewDB()
+	db_service := mysql_service.NewDBService()
+
+	repository := gorm.NewRepository(db, db_service)
 	connection, _ := repository.NewConnection()
 
-	logger := zap.NewZapLogger()
+	logger := zap.NewZapApiResponseLogger()
 
 	controller := rest_controller.NewController(connection, logger)
 	ws_handler := ws_handler.NewWsHandler(connection, logger)
+
+	// 認証を行う
+	// TODO: 最終的にはJWTの検証としたい
+	// e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
+	// 	// return key == "valid-key", nil
+	// 	return true, nil
+	// }))
 
 	// CustomContextを使用する
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -44,9 +54,10 @@ func Init() {
 		}
 	})
 
-	router.AddUsersRoutingGroup(e, controller)
-	router.AddGroupsRoutingGroup(e, controller)
-	router.AddPlaysRoutingGroup(e, controller)
+	rest_router.AddUsersRoutingGroup(e, controller)
+	rest_router.AddGroupsRoutingGroup(e, controller)
+	rest_router.AddPlaysRoutingGroup(e, controller)
+	rest_router.AddChatsRoutingGroup(e, controller)
 
 	ws_router.AddWsRoutingGroup(e, ws_handler)
 

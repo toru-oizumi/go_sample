@@ -1,6 +1,6 @@
 package logger
 
-type Logger interface {
+type RestApiLogger interface {
 	Debug(...interface{}) error
 	Info(...interface{}) error
 	Warning(...interface{}) error

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"go_sample/app/domain/model"
 
-	"go_sample/app/interface/controller/logger"
 	enum_connection "go_sample/app/interface/controller/ws/enum/connection"
+	"go_sample/app/interface/gateway/logger"
 
 	"github.com/labstack/echo/v4"
 
@@ -13,7 +13,7 @@ import (
 )
 
 type PlayWsHandler struct {
-	Logger logger.Logger
+	Logger logger.WsApiLogger
 }
 
 type PlayRequest struct {

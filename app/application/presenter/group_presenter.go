@@ -6,8 +6,6 @@ import (
 )
 
 type GroupPresenter interface {
-	BuildFindByIDResponse(object *model.Group) (*output.FindGroupByIDResponse, error)
-	BuildFindAllResponse(objects model.Groups) (output.FindAllGroupsResponse, error)
-	BuildCreateResponse(object *model.Group) (*output.CreateGroupResponse, error)
-	BuildUpdateResponse(object *model.Group) (*output.UpdateGroupResponse, error)
+	BuildGroupResponse(object model.Group) (*output.GroupResponse, error)
+	BuildGroupsResponse(objects []model.Group) ([]output.GroupResponse, error)
 }

@@ -4,25 +4,44 @@ import (
 	"go_sample/app/application/input"
 	"go_sample/app/application/usecase"
 	"go_sample/app/interface/controller/context"
-	"go_sample/app/interface/controller/logger"
+	"go_sample/app/interface/gateway/logger"
 	"net/http"
 )
 
 type GroupController struct {
 	Usecase usecase.GroupUsecase
-	Logger  logger.Logger
+	Logger  logger.RestApiLogger
 }
 
 func (ctrl *GroupController) Find(c context.Context) error {
 	request := new(input.FindGroupByIDRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
 	if group, err := ctrl.Usecase.FindByID(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusOK, group)
+	}
+}
+
+func (ctrl *GroupController) FindList(c context.Context) error {
+	request := new(input.FindGroupsRequest)
+	c.Bind(request)
+
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+
+	if groups, err := ctrl.Usecase.FindList(*request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	} else {
+		return c.CreateSuccessResponse(ctrl.Logger, http.StatusOK, groups)
 	}
 }
 
@@ -36,8 +55,12 @@ func (ctrl *GroupController) FindAll(c context.Context) error {
 
 func (ctrl *GroupController) Create(c context.Context) error {
 	request := new(input.CreateGroupRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
 	if group, err := ctrl.Usecase.Create(*request); err != nil {
@@ -49,8 +72,12 @@ func (ctrl *GroupController) Create(c context.Context) error {
 
 func (ctrl *GroupController) Update(c context.Context) error {
 	request := new(input.UpdateGroupRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
 	if group, err := ctrl.Usecase.Update(*request); err != nil {
@@ -61,12 +88,16 @@ func (ctrl *GroupController) Update(c context.Context) error {
 }
 
 func (ctrl *GroupController) Delete(c context.Context) error {
-	request := new(input.DeleteGroupByIDRequest)
-	if err := c.BindAndValidate(ctrl.Logger, request); err != nil {
-		return err
+	request := new(input.DeleteGroupRequest)
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(ctrl.Logger, err)
 	}
 
-	if err := ctrl.Usecase.DeleteByID(*request); err != nil {
+	if err := ctrl.Usecase.Delete(*request); err != nil {
 		return c.CreateErrorResponse(ctrl.Logger, err)
 	} else {
 		return c.CreateSuccessResponse(ctrl.Logger, http.StatusNoContent, nil)

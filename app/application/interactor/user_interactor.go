@@ -13,24 +13,41 @@ type UserInteractor struct {
 	Presenter  presenter.UserPresenter
 }
 
-func (i *UserInteractor) FindByID(request input.FindUserByIDRequest) (*output.FindUserByIDResponse, error) {
+func (i *UserInteractor) FindByID(request input.FindUserByIDRequest) (*output.UserResponse, error) {
 	if user, err := i.Connection.User().FindByID(request.ID); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindByIDResponse(user)
+		return i.Presenter.BuildUserResponse(*user)
 	}
 }
 
-func (i *UserInteractor) FindAll() (output.FindAllUsersResponse, error) {
-	if users, err := i.Connection.User().List(repository.UserFilter{NameLike: ""}); err != nil {
+func (i *UserInteractor) FindList(request input.FindUsersRequest) ([]output.UserResponse, error) {
+	filter := repository.UserFilter{
+		GroupID:  request.GroupID,
+		NameLike: request.NameLike,
+	}
+	if users, err := i.Connection.User().List(filter); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildFindAllResponse(users)
+		return i.Presenter.BuildUsersResponse(users)
 	}
 }
 
-func (i *UserInteractor) Create(request input.CreateUserRequest) (*output.CreateUserResponse, error) {
-	group, err := i.Connection.Group().FindByID(request.GroupID)
+func (i *UserInteractor) FindAll() ([]output.UserResponse, error) {
+	if users, err := i.Connection.User().List(repository.UserFilter{}); err != nil {
+		return nil, err
+	} else {
+		return i.Presenter.BuildUsersResponse(users)
+	}
+}
+
+func (i *UserInteractor) Create(request input.CreateUserRequest) (*output.UserResponse, error) {
+	group_id := model.GroupID("01FM9QCV7VCW7YEH72STK8D79X")
+	if len(request.GroupID) > 0 {
+		group_id = request.GroupID
+	}
+
+	group, err := i.Connection.Group().FindByID(group_id)
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +70,12 @@ func (i *UserInteractor) Create(request input.CreateUserRequest) (*output.Create
 		return nil, err
 	} else {
 		parsed_user, _ := created_user.(*model.User)
-		return i.Presenter.BuildCreateResponse(parsed_user)
+		return i.Presenter.BuildUserResponse(*parsed_user)
 	}
 
 }
 
-func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.UpdateUserResponse, error) {
+func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.UserResponse, error) {
 	group, err := i.Connection.Group().FindByID(request.GroupID)
 	if err != nil {
 		return nil, err
@@ -83,18 +100,18 @@ func (i *UserInteractor) Update(request input.UpdateUserRequest) (*output.Update
 		return nil, err
 	} else {
 		parsed_user, _ := updated_user.(*model.User)
-		return i.Presenter.BuildUpdateResponse(parsed_user)
+		return i.Presenter.BuildUserResponse(*parsed_user)
 	}
 }
 
-func (i *UserInteractor) DeleteByID(request input.DeleteUserByIDRequest) error {
+func (i *UserInteractor) Delete(request input.DeleteUserRequest) error {
 	if _, err := i.Connection.User().FindByID(request.ID); err != nil {
 		return err
 	}
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.User().DeleteByID(request.ID); err != nil {
+			if err := tx.User().Delete(request.ID); err != nil {
 				return nil, err
 			} else {
 				return nil, nil

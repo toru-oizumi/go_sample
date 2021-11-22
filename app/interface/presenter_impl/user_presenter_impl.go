@@ -7,12 +7,12 @@ import (
 
 type UserPresenter struct{}
 
-func NewUserPresenter() *UserPresenter {
-	return &UserPresenter{}
+func NewUserPresenter() UserPresenter {
+	return UserPresenter{}
 }
 
-func (p *UserPresenter) BuildFindByIDResponse(object *model.User) (*output.FindUserByIDResponse, error) {
-	return &output.FindUserByIDResponse{
+func (p UserPresenter) BuildUserResponse(object model.User) (*output.UserResponse, error) {
+	return &output.UserResponse{
 		ID:        object.ID,
 		Name:      object.Name,
 		Age:       object.Age,
@@ -21,12 +21,17 @@ func (p *UserPresenter) BuildFindByIDResponse(object *model.User) (*output.FindU
 		UpdatedAt: object.UpdatedAt,
 	}, nil
 }
-func (p *UserPresenter) BuildFindAllResponse(objects model.Users) (output.FindAllUsersResponse, error) {
-	var result output.FindAllUsersResponse
+
+func (p UserPresenter) BuildUsersResponse(objects []model.User) ([]output.UserResponse, error) {
+	if objects == nil {
+		return []output.UserResponse{}, nil
+	}
+
+	var result []output.UserResponse
 	for _, object := range objects {
 		result = append(
 			result,
-			model.User{
+			output.UserResponse{
 				ID:        object.ID,
 				Name:      object.Name,
 				Age:       object.Age,
@@ -36,26 +41,5 @@ func (p *UserPresenter) BuildFindAllResponse(objects model.Users) (output.FindAl
 			},
 		)
 	}
-
 	return result, nil
-}
-func (p *UserPresenter) BuildCreateResponse(object *model.User) (*output.CreateUserResponse, error) {
-	return &output.CreateUserResponse{
-		ID:        object.ID,
-		Name:      object.Name,
-		Age:       object.Age,
-		Group:     object.Group,
-		CreatedAt: object.CreatedAt,
-		UpdatedAt: object.UpdatedAt,
-	}, nil
-}
-func (p *UserPresenter) BuildUpdateResponse(object *model.User) (*output.UpdateUserResponse, error) {
-	return &output.UpdateUserResponse{
-		ID:        object.ID,
-		Name:      object.Name,
-		Age:       object.Age,
-		Group:     object.Group,
-		CreatedAt: object.CreatedAt,
-		UpdatedAt: object.UpdatedAt,
-	}, nil
 }

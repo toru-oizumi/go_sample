@@ -19,6 +19,6 @@ type UpdatePlayRequest struct {
 	Name model.PlayName `json:"name" form:"name" validate:"required"`
 }
 
-type DeletePlayByIDRequest struct {
+type DeletePlayRequest struct {
 	ID model.PlayID `param:"id" validate:"required"`
 }
