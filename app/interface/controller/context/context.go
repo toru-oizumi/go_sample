@@ -1,7 +1,6 @@
 package context
 
 import (
-	"go_sample/app/interface/gateway/logger"
 	"net/http"
 )
 
@@ -12,6 +11,6 @@ type Context interface {
 	Bind(interface{}) error
 	JSON(int, interface{}) error
 	Validate(interface{}) error
-	CreateErrorResponse(logger.RestApiLogger, error) error
-	CreateSuccessResponse(logger.RestApiLogger, int, interface{}) error
+	CreateErrorResponse(error) error
+	CreateSuccessResponse(int, interface{}) error
 }

@@ -36,8 +36,8 @@ func Init() {
 
 	logger := zap.NewZapApiResponseLogger()
 
-	controller := rest_controller.NewController(connection, logger)
-	ws_handler := ws_handler.NewWsHandler(connection, logger)
+	controller := rest_controller.NewController(connection)
+	ws_handler := ws_handler.NewWsHandler(connection)
 
 	// 認証を行う
 	// TODO: 最終的にはJWTの検証としたい
@@ -49,7 +49,10 @@ func Init() {
 	// CustomContextを使用する
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &context.CustomContext{Context: c}
+			cc := &context.CustomContext{
+				Context:       c,
+				RestApiLogger: logger,
+			}
 			return next(cc)
 		}
 	})
