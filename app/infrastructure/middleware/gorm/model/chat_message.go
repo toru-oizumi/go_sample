@@ -15,11 +15,11 @@ type ChatMessageRDBRecord struct {
 	Body         string `gorm:"type:text;not null"`
 	IsPrivileged bool   `gorm:"type:bool;not null;default:false"`
 	UpdatedAt    time.Time
-	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	DeletedAt    gorm.DeletedAt `gorm:"index"` // gormのデフォルトに則って設定しているが、基本物理削除するので使わない想定
 }
 
 func (ChatMessageRDBRecord) TableName() string {
-	return "chatMessages"
+	return "chat_messages"
 }
 
 func (r *ChatMessageRDBRecord) ToDomain() (*model.ChatMessage, error) {

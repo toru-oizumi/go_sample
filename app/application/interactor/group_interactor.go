@@ -1,11 +1,14 @@
 package interactor
 
 import (
+	"errors"
 	"go_sample/app/application/input"
 	"go_sample/app/application/output"
 	"go_sample/app/application/presenter"
 	"go_sample/app/domain/model"
 	"go_sample/app/domain/repository"
+	"go_sample/app/domain/service"
+	util_error "go_sample/app/utility/error"
 )
 
 type GroupInteractor struct {
@@ -41,49 +44,52 @@ func (i *GroupInteractor) FindAll() ([]output.GroupResponse, error) {
 }
 
 func (i *GroupInteractor) Create(request input.CreateGroupRequest) (*output.GroupResponse, error) {
-	// TODO: Groupに所属していない場合しか作成できない
 	group := model.Group{
-		Name: request.Name,
+		Name:            request.Name,
+		NumberOfMembers: 0,
 	}
 
-	if created_group, err := i.Connection.RunTransaction(
-		func(tx repository.Transaction) (interface{}, error) {
-			// Group作成
-			created_group, err := tx.Group().Store(group)
-			if err != nil {
-				return nil, err
-			}
-
-			// Userの取得
-			// ChatのMembersに設定するUserIDの存在確認も兼ねて、先に取得する
-			user, err := tx.User().FindByID(request.UserID)
-			if err != nil {
-				return nil, err
-			}
-
-			// Group向けchatを作成
-			chat := model.Chat{
-				Name:    model.ChatName(request.Name),
-				Members: []model.UserID{request.UserID},
-			}
-			if _, err := tx.Chat().Store(chat); err != nil {
-				return nil, err
-			}
-
-			// userのGroupを書き換え
-			user.Group = *created_group
-			if _, err := tx.User().Update(*user); err != nil {
-				return nil, err
-			}
-
-			return created_group, nil
-		},
-	); err != nil {
+	// Userの取得
+	// ChatのMembersに設定するUserの存在確認も兼ねて、先に取得する
+	user, err := i.Connection.User().FindByID(request.UserID)
+	if err != nil {
 		return nil, err
-	} else {
-		parsed_group, _ := created_group.(model.Group)
-		return i.Presenter.BuildGroupResponse(parsed_group)
 	}
+
+	// グループに未所属(FreeGroupNameのグループに所属)の場合のみ、グループを作成できる
+	if user.Group.Name != model.FreeGroupName {
+		return nil, util_error.NewErrBadRequest("only users who are not yet members of a group can create a group")
+	}
+
+	created_group, err := i.Connection.RunTransaction(
+		func(tx repository.Transaction) (interface{}, error) {
+			domain_service := service.NewDomainService(tx)
+
+			// Group作成
+			created_group_id, err := domain_service.Group.Create(group)
+			if err != nil {
+				return nil, err
+			}
+
+			created_group, err := tx.Group().FindByID(*created_group_id)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := domain_service.User.JoinGroup(*user, *created_group); err != nil {
+				return nil, err
+			}
+
+			return *created_group, nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	parsed_group, _ := created_group.(model.Group)
+	return i.Presenter.BuildGroupResponse(parsed_group)
 }
 
 func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.GroupResponse, error) {
@@ -92,37 +98,55 @@ func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.Grou
 		Name: request.Name,
 	}
 
-	if updated_group, err := i.Connection.RunTransaction(
+	updated_group, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if updated_group, err := tx.Group().Update(group); err != nil {
+			domain_service := service.NewDomainService(tx)
+
+			// Group更新
+			updated_group_id, err := domain_service.Group.Update(group)
+			if err != nil {
 				return nil, err
-			} else {
-				return updated_group, nil
 			}
+
+			updated_group, err := tx.Group().FindByID(*updated_group_id)
+			if err != nil {
+				return nil, err
+			}
+
+			return *updated_group, nil
 		},
-	); err != nil {
+	)
+	if err != nil {
 		return nil, err
-	} else {
-		parsed_group, _ := updated_group.(model.Group)
-		return i.Presenter.BuildGroupResponse(parsed_group)
 	}
+
+	parsed_group, _ := updated_group.(model.Group)
+	return i.Presenter.BuildGroupResponse(parsed_group)
 }
 
 func (i *GroupInteractor) Delete(request input.DeleteGroupRequest) error {
 	if _, err := i.Connection.Group().FindByID(request.ID); err != nil {
+		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
+		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+			return nil
+		}
 		return err
 	}
-	if _, err := i.Connection.RunTransaction(
+
+	_, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Group().Delete(request.ID); err != nil {
+			domain_service := service.NewDomainService(tx)
+
+			err := domain_service.Group.Delete(request.ID)
+			if err != nil {
 				return nil, err
-			} else {
-				return nil, nil
 			}
 
-			// TODO: Group向けChatの削除
+			return nil, nil
 		},
-	); err != nil {
+	)
+
+	if err != nil {
 		return err
 	} else {
 		return nil

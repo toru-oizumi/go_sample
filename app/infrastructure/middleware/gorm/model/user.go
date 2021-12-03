@@ -8,14 +8,13 @@ import (
 )
 
 type UserRDBRecord struct {
-	ID        string         `gorm:"type:varchar(255);primarykey"`
-	Name      string         `gorm:"type:varchar(255);unique;not null"`
-	Age       uint           `gorm:"not null"`
-	GroupID   string         `gorm:"not null"`
-	Group     GroupRDBRecord `gorm:"foreignKey:GroupID"`
+	ID        string `gorm:"type:varchar(255);primarykey"`
+	Name      string `gorm:"type:varchar(255);unique;not null"`
+	GroupID   string `gorm:"not null"`
+	Group     GroupRDBRecord
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	DeletedAt gorm.DeletedAt `gorm:"index"` // gormのデフォルトに則って設定しているが、基本物理削除するので使わない想定
 }
 
 func (UserRDBRecord) TableName() string {
@@ -31,7 +30,6 @@ func (r *UserRDBRecord) ToDomain() (*model.User, error) {
 	user := model.User{
 		ID:        model.UserID(r.ID),
 		Name:      model.UserName(r.Name),
-		Age:       model.UserAge(r.Age),
 		Group:     *group,
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
@@ -51,7 +49,6 @@ func (r *UserRDBRecord) FromDomain(d model.User) UserRDBRecord {
 	return UserRDBRecord{
 		ID:        string(d.ID),
 		Name:      string(d.Name),
-		Age:       uint(d.Age),
 		GroupID:   string(db_group.ID),
 		CreatedAt: d.CreatedAt,
 		UpdatedAt: d.UpdatedAt,

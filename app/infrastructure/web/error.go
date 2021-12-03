@@ -13,11 +13,11 @@ type ApiError struct {
 func NewApiError(err error) ApiError {
 	var httpStatusCode int
 	switch err.(type) {
-	case *util_error.ErrValidationError:
+	case util_error.ErrValidationError:
 		httpStatusCode = http.StatusBadRequest
-	case *util_error.ErrRecordNotFound:
+	case util_error.ErrRecordNotFound:
 		httpStatusCode = http.StatusNotFound
-	case *util_error.ErrRecordDuplicate:
+	case util_error.ErrRecordDuplicate:
 		httpStatusCode = http.StatusConflict
 	default:
 		httpStatusCode = http.StatusInternalServerError

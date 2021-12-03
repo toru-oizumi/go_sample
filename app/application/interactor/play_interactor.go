@@ -1,11 +1,13 @@
 package interactor
 
 import (
+	"errors"
 	"go_sample/app/application/input"
 	"go_sample/app/application/output"
 	"go_sample/app/application/presenter"
 	"go_sample/app/domain/model"
 	"go_sample/app/domain/repository"
+	util_error "go_sample/app/utility/error"
 )
 
 type PlayInteractor struct {
@@ -87,6 +89,10 @@ func (i *PlayInteractor) Update(request input.UpdatePlayRequest) (*output.PlayRe
 
 func (i *PlayInteractor) Delete(request input.DeletePlayRequest) error {
 	if _, err := i.Connection.Play().FindByID(request.ID); err != nil {
+		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
+		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+			return nil
+		}
 		return err
 	}
 

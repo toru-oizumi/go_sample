@@ -15,7 +15,6 @@ type UserAge uint
 type User struct {
 	ID        UserID   `validate:"required"`
 	Name      UserName `validate:"required"`
-	Age       UserAge  `validate:"numeric,gte=0,lt=200"`
 	Group     Group
 	CreatedAt time.Time `validate:"required"`
 	UpdatedAt time.Time `validate:"required"`

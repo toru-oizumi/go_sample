@@ -15,7 +15,6 @@ func (p UserPresenter) BuildUserResponse(object model.User) (*output.UserRespons
 	return &output.UserResponse{
 		ID:        object.ID,
 		Name:      object.Name,
-		Age:       object.Age,
 		Group:     object.Group,
 		CreatedAt: object.CreatedAt,
 		UpdatedAt: object.UpdatedAt,
@@ -34,7 +33,6 @@ func (p UserPresenter) BuildUsersResponse(objects []model.User) ([]output.UserRe
 			output.UserResponse{
 				ID:        object.ID,
 				Name:      object.Name,
-				Age:       object.Age,
 				Group:     object.Group,
 				CreatedAt: object.CreatedAt,
 				UpdatedAt: object.UpdatedAt,

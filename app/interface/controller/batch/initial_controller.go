@@ -12,7 +12,7 @@ type InitialController struct {
 
 func (ctrl *InitialController) Initialize() error {
 	if err := ctrl.Usecase.DataBaseInitialize(); err != nil {
-		return ctrl.Logger.Fatal("Failed to initialize the database.")
+		return ctrl.Logger.Fatal("Failed to initialize the database.", err)
 	}
 	return nil
 }

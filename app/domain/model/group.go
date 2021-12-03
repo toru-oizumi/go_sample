@@ -9,15 +9,20 @@ import (
 const maximum_number_of_group_members uint = 10
 
 type GroupID string
+
 type GroupName string
+
+const FreeGroupName = GroupName("free")
+
 type GroupNumberOfMembers uint
 
 type Group struct {
 	ID              GroupID              `validate:"required"`
 	Name            GroupName            `validate:"required"`
 	NumberOfMembers GroupNumberOfMembers `validate:"numeric"`
-	CreatedAt       time.Time            `validate:"required"`
-	UpdatedAt       time.Time            `validate:"required"`
+	Chat            Chat
+	CreatedAt       time.Time `validate:"required"`
+	UpdatedAt       time.Time `validate:"required"`
 }
 
 func (m *Group) CanAddMember() bool {

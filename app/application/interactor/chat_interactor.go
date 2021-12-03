@@ -1,11 +1,13 @@
 package interactor
 
 import (
+	"errors"
 	"go_sample/app/application/input"
 	"go_sample/app/application/output"
 	"go_sample/app/application/presenter"
 	"go_sample/app/domain/model"
 	"go_sample/app/domain/repository"
+	util_error "go_sample/app/utility/error"
 )
 
 type ChatInteractor struct {
@@ -14,10 +16,16 @@ type ChatInteractor struct {
 }
 
 func (i *ChatInteractor) FindAll(request input.FindChatsRequest) ([]output.ChatResponse, error) {
-	if chats, err := i.Connection.Chat().List(repository.ChatFilter{UserID: model.UserID("1")}); err != nil {
+	if chats, err := i.Connection.Chat().List(repository.ChatFilter{UserID: request.UserID}); err != nil {
 		return nil, err
 	} else {
-		return i.Presenter.BuildChatsResponse(chats)
+		// 取得したchatのリストに、全体向けchat(AllChatName)を加える
+		if chat_for_all, err := i.Connection.Chat().FindByName(model.AllChatName); err != nil {
+			return nil, err
+		} else {
+			chats = append(chats, *chat_for_all)
+			return i.Presenter.BuildChatsResponse(chats)
+		}
 	}
 }
 
@@ -79,6 +87,10 @@ func (i *ChatInteractor) UpdateMessage(request input.UpdateChatMessageRequest) (
 
 func (i *ChatInteractor) DeleteMessage(request input.DeleteChatMessageRequest) error {
 	if _, err := i.Connection.ChatMessage().FindByID(request.ChatMessageID); err != nil {
+		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
+		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+			return nil
+		}
 		return err
 	}
 	if _, err := i.Connection.RunTransaction(

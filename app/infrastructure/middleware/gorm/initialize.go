@@ -14,8 +14,8 @@ func Init() {
 
 	repository := NewRepository(db, db_service)
 	connection, _ := repository.NewConnection()
-	logger := zap.NewZapLogger()
+	logger := zap.NewZapBatchLogger()
 
 	controller := batch_controller.NewController(connection, logger)
-	controller.Initial().Usecase.DataBaseInitialize()
+	controller.Initial().Initialize()
 }

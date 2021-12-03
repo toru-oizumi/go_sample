@@ -12,6 +12,9 @@ type Config struct {
 	DBHost     string `required:"true" split_words:"true"`
 	DBPort     string `required:"true" split_words:"true"`
 	DBName     string `required:"true" split_words:"true"`
+
+	FreeGroupName string
+	AllChatName   string
 }
 
 func LoadConfig() Config {
@@ -19,5 +22,6 @@ func LoadConfig() Config {
 	if err := envconfig.Process("", &con); err != nil {
 		log.Fatal(err)
 	}
+
 	return con
 }

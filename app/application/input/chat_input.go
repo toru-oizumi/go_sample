@@ -5,7 +5,7 @@ import (
 )
 
 type FindChatsRequest struct {
-	UserID model.UserID `param:"userID" validate:"required"`
+	UserID model.UserID `query:"userID" validate:"required"`
 }
 
 type FindChatMessagesByIDRequest struct {

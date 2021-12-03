@@ -12,12 +12,13 @@ type ChatMessageID string
 
 type ChatName string
 
+const AllChatName = ChatName("all")
+
 type ChatBody string
 
 type Chat struct {
 	ID        ChatID    `validate:"required"`
 	Name      ChatName  `validate:"required"`
-	Members   []UserID  `validate:"required"`
 	CreatedAt time.Time `validate:"required"`
 	UpdatedAt time.Time `validate:"required"`
 }

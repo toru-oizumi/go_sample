@@ -15,7 +15,6 @@ func (p ChatPresenter) BuildChatResponse(object model.Chat) (*output.ChatRespons
 	return &output.ChatResponse{
 		ID:        object.ID,
 		Name:      object.Name,
-		Members:   object.Members,
 		CreatedAt: object.CreatedAt,
 		UpdatedAt: object.UpdatedAt,
 	}, nil
@@ -33,7 +32,6 @@ func (p ChatPresenter) BuildChatsResponse(objects []model.Chat) ([]output.ChatRe
 			output.ChatResponse{
 				ID:        object.ID,
 				Name:      object.Name,
-				Members:   object.Members,
 				CreatedAt: object.CreatedAt,
 				UpdatedAt: object.UpdatedAt,
 			},

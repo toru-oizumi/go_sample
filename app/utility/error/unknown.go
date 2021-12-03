@@ -4,12 +4,12 @@ type ErrUnknown struct {
 	Message string
 }
 
-func (e *ErrUnknown) Error() string {
+func (e ErrUnknown) Error() string {
 	return e.Message
 }
 
-func NewErrUnknown() *ErrUnknown {
-	return &ErrUnknown{
+func NewErrUnknown() ErrUnknown {
+	return ErrUnknown{
 		Message: "unknown error",
 	}
 }

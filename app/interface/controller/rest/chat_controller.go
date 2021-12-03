@@ -14,7 +14,6 @@ type ChatController struct {
 
 func (ctrl *ChatController) FindAll(c context.Context) error {
 	request := new(input.FindChatsRequest)
-	request.UserID = model.UserID(c.QueryParam("user_id"))
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)

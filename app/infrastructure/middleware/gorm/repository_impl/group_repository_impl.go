@@ -19,10 +19,39 @@ type GroupRepository struct {
 	Service db.DBService
 }
 
+func (repo *GroupRepository) Exists(id model.GroupID) (bool, error) {
+	var db_group db_model.GroupRDBRecord
+
+	if err := repo.DB.Select("`id`").Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (repo *GroupRepository) FindByID(id model.GroupID) (*model.Group, error) {
 	var db_group db_model.GroupRDBRecord
 
-	if err := repo.DB.Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
+	if err := repo.DB.Joins("Chat").Take(&db_group, "`groups`.`id` = ?", string(id)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, util_error.NewErrRecordNotFound()
+		}
+		return nil, err
+	}
+
+	if group, err := db_group.ToDomain(); err != nil {
+		return nil, err
+	} else {
+		return group, nil
+	}
+}
+
+func (repo *GroupRepository) FindByName(name model.GroupName) (*model.Group, error) {
+	var db_group db_model.GroupRDBRecord
+
+	if err := repo.DB.Joins("Chat").Take(&db_group, "`groups`.`name` = ?", string(name)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
 		}
@@ -40,7 +69,7 @@ func (repo *GroupRepository) List(filter repository.GroupFilter) ([]model.Group,
 	var db_groups []db_model.GroupRDBRecord
 	var groups []model.Group
 
-	query := repo.DB
+	query := repo.DB.Joins("Chat")
 
 	if len(filter.NameLike) != 0 {
 		query = query.Where("`groups`.`name` LIKE ?", fmt.Sprintf("%%%s%%", filter.NameLike))
@@ -64,10 +93,13 @@ func (repo *GroupRepository) List(filter repository.GroupFilter) ([]model.Group,
 	}
 }
 
-func (repo *GroupRepository) Store(object model.Group) (*model.Group, error) {
+func (repo *GroupRepository) Store(object model.Group) (*model.GroupID, error) {
 	var db_group db_model.GroupRDBRecord
 	db_group = db_group.FromDomain(object)
-	db_group.ID = utility.GetUlid()
+	// IDは設定が無ければ生成する
+	if len(db_group.ID) <= 0 {
+		db_group.ID = utility.GetUlid()
+	}
 
 	if err := repo.DB.Create(&db_group).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
@@ -77,14 +109,11 @@ func (repo *GroupRepository) Store(object model.Group) (*model.Group, error) {
 		}
 	}
 
-	if group, err := db_group.ToDomain(); err != nil {
-		return &model.Group{}, err
-	} else {
-		return group, nil
-	}
+	group_id := model.GroupID(db_group.ID)
+	return &group_id, nil
 }
 
-func (repo *GroupRepository) Update(object model.Group) (*model.Group, error) {
+func (repo *GroupRepository) Update(object model.Group) (*model.GroupID, error) {
 	var db_group db_model.GroupRDBRecord
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -102,24 +131,54 @@ func (repo *GroupRepository) Update(object model.Group) (*model.Group, error) {
 		}
 	}
 
-	if group, err := db_group.ToDomain(); err != nil {
-		return nil, err
-	} else {
-		return group, nil
-	}
+	group_id := model.GroupID(db_group.ID)
+	return &group_id, nil
 }
 
-func (repo *GroupRepository) Delete(id model.GroupID) error {
+func (repo *GroupRepository) IncreaseNumberOfMembers(id model.GroupID, num uint) error {
 	var db_group db_model.GroupRDBRecord
-	if err := repo.DB.Take(&db_group, string(id)).Error; err != nil {
+	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return util_error.NewErrRecordNotFound()
 		}
 		return err
 	}
+	db_group.NumberOfMembers = db_group.NumberOfMembers + num
 
-	if err := repo.DB.Delete(&db_group).Error; err != nil {
-		return nil
+	if err := repo.DB.Save(&db_group).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *GroupRepository) DecreaseNumberOfMembers(id model.GroupID, num uint) error {
+	var db_group db_model.GroupRDBRecord
+	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return util_error.NewErrRecordNotFound()
+		}
+		return err
+	}
+	db_group.NumberOfMembers = db_group.NumberOfMembers - num
+
+	if db_group.NumberOfMembers > 0 {
+		if err := repo.DB.Save(&db_group).Error; err != nil {
+			return err
+		}
+	} else {
+		// 所属人数(NumberOfMembers)が0人になったGroupは削除する
+		// XXX: この処理はUsecaseに寄せるべきか？
+		if err := repo.DB.Unscoped().Delete(&db_group).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (repo *GroupRepository) Delete(id model.GroupID) error {
+	var db_group db_model.GroupRDBRecord
+	if err := repo.DB.Unscoped().Delete(&db_group, "`id` = ?", string(id)).Error; err != nil {
+		return err
 	}
 
 	return nil

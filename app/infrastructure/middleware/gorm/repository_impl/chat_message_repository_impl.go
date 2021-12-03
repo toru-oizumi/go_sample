@@ -9,7 +9,6 @@ import (
 	"go_sample/app/utility"
 	util_error "go_sample/app/utility/error"
 
-	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -19,6 +18,18 @@ import (
 type ChatMessageRepository struct {
 	DB      *gorm.DB
 	Service db.DBService
+}
+
+func (repo *ChatMessageRepository) Exists(id model.ChatMessageID) (bool, error) {
+	var db_chat_message db_model.ChatMessageRDBRecord
+
+	if err := repo.DB.Select("`id`").Take(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 func (repo *ChatMessageRepository) FindByID(id model.ChatMessageID) (*model.ChatMessage, error) {
@@ -57,10 +68,13 @@ func (repo *ChatMessageRepository) List(filter repository.ChatMessageFilter) ([]
 	}
 }
 
-func (repo *ChatMessageRepository) Store(object model.ChatMessage) (*model.ChatMessage, error) {
+func (repo *ChatMessageRepository) Store(object model.ChatMessage) (*model.ChatMessageID, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 	db_chat_message = db_chat_message.FromDomain(object)
-	db_chat_message.ID = utility.GetUlid()
+	// IDは設定が無ければ生成する
+	if len(db_chat_message.ID) <= 0 {
+		db_chat_message.ID = utility.GetUlid()
+	}
 
 	if err := repo.DB.Create(&db_chat_message).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
@@ -70,14 +84,11 @@ func (repo *ChatMessageRepository) Store(object model.ChatMessage) (*model.ChatM
 		}
 	}
 
-	if chat_message, err := repo.FindByID(model.ChatMessageID(db_chat_message.ID)); err != nil {
-		return nil, err
-	} else {
-		return chat_message, nil
-	}
+	chat_message_id := model.ChatMessageID(db_chat_message.ID)
+	return &chat_message_id, nil
 }
 
-func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.ChatMessage, error) {
+func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.ChatMessageID, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_chat_message, string(object.ID)).Error; err != nil {
@@ -91,26 +102,20 @@ func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.Chat
 	db_chat_message.Body = string(object.Body)
 
 	if err := repo.DB.Save(&db_chat_message).Error; err != nil {
-		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
-		// DBがMySQLの場合
-		mysqlErr := err.(*mysql.MySQLError)
-		switch mysqlErr.Number {
-		case 1062:
+		if repo.Service.IsDuplicateError(err) {
 			return nil, util_error.NewErrRecordDuplicate()
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
-	if chat_message, err := repo.FindByID(model.ChatMessageID(db_chat_message.ID)); err != nil {
-		return nil, err
-	} else {
-		return chat_message, nil
-	}
+	chat_message_id := model.ChatMessageID(db_chat_message.ID)
+	return &chat_message_id, nil
 }
 
 func (repo *ChatMessageRepository) Delete(id model.ChatMessageID) error {
 	var db_chat_message db_model.ChatMessageRDBRecord
-	if err := repo.DB.Take(&db_chat_message, string(id)).Error; err != nil {
+	if err := repo.DB.Take(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return util_error.NewErrRecordNotFound()
 		}
@@ -118,7 +123,7 @@ func (repo *ChatMessageRepository) Delete(id model.ChatMessageID) error {
 	}
 
 	// TODO: ChatIDとUserIDのチェック
-	if err := repo.DB.Delete(&db_chat_message).Error; err != nil {
+	if err := repo.DB.Unscoped().Delete(&db_chat_message).Error; err != nil {
 		return err
 	}
 

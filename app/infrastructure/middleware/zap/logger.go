@@ -74,11 +74,9 @@ func (l *ZapLogger) Fatal(args ...interface{}) error {
 	logger := l.Logger
 	defer logger.Sync()
 
-	httpStatusCode, _ := args[0].(int)
-	message, _ := args[1].(string)
+	message, _ := args[0].(string)
 
-	logger.Fatal("InternalServerError",
-		zap.Int("status_code", httpStatusCode),
+	logger.Fatal("ERROR",
 		zap.String("message", message),
 	)
 	return nil

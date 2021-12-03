@@ -9,7 +9,6 @@ import (
 	"go_sample/app/utility"
 	util_error "go_sample/app/utility/error"
 
-	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -17,6 +16,18 @@ import (
 type PlayRepository struct {
 	DB      *gorm.DB
 	Service db.DBService
+}
+
+func (repo *PlayRepository) Exists(id model.PlayID) (bool, error) {
+	var db_room db_model.PlayRDBRecord
+
+	if err := repo.DB.Select("`id`").Take(&db_room, "`id` = ?", string(id)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 func (repo *PlayRepository) FindByID(id model.PlayID) (*model.Play, error) {
@@ -54,10 +65,13 @@ func (repo *PlayRepository) List(filter repository.PlayFilter) ([]model.Play, er
 	}
 }
 
-func (repo *PlayRepository) Store(object model.Play) (*model.Play, error) {
+func (repo *PlayRepository) Store(object model.Play) (*model.PlayID, error) {
 	var db_room db_model.PlayRDBRecord
 	db_room = db_room.FromDomain(object)
-	db_room.ID = utility.GetUlid()
+	// IDは設定が無ければ生成する
+	if len(db_room.ID) <= 0 {
+		db_room.ID = utility.GetUlid()
+	}
 
 	if err := repo.DB.Create(&db_room).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
@@ -67,14 +81,11 @@ func (repo *PlayRepository) Store(object model.Play) (*model.Play, error) {
 		}
 	}
 
-	if room, err := repo.FindByID(model.PlayID(db_room.ID)); err != nil {
-		return nil, err
-	} else {
-		return room, nil
-	}
+	room_id := model.PlayID(db_room.ID)
+	return &room_id, nil
 }
 
-func (repo *PlayRepository) Update(object model.Play) (*model.Play, error) {
+func (repo *PlayRepository) Update(object model.Play) (*model.PlayID, error) {
 	var db_room db_model.PlayRDBRecord
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_room, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -85,33 +96,20 @@ func (repo *PlayRepository) Update(object model.Play) (*model.Play, error) {
 	db_room.Name = string(object.Name)
 
 	if err := repo.DB.Save(&db_room).Error; err != nil {
-		// ここではGormに依存はしても、DBの種類に依存したくはないが、妥協
-		// DBがMySQLの場合
-		mysqlErr := err.(*mysql.MySQLError)
-		switch mysqlErr.Number {
-		case 1062:
+		if repo.Service.IsDuplicateError(err) {
 			return nil, util_error.NewErrRecordDuplicate()
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
-	if room, err := repo.FindByID(model.PlayID(db_room.ID)); err != nil {
-		return nil, err
-	} else {
-		return room, nil
-	}
+	room_id := model.PlayID(db_room.ID)
+	return &room_id, nil
 }
 
 func (repo *PlayRepository) Delete(id model.PlayID) error {
 	var db_room db_model.PlayRDBRecord
-	if err := repo.DB.Take(&db_room, string(id)).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return util_error.NewErrRecordNotFound()
-		}
-		return err
-	}
-
-	if err := repo.DB.Delete(&db_room).Error; err != nil {
+	if err := repo.DB.Unscoped().Delete(&db_room, "`id` = ?", string(id)).Error; err != nil {
 		return err
 	}
 

@@ -1,9 +1,9 @@
 package logger
 
 type BatchLogger interface {
-	Debug(...interface{}) error
-	Info(...interface{}) error
-	Warning(...interface{}) error
-	Error(...interface{}) error
-	Fatal(...interface{}) error
+	Debug(message string, err error) error
+	Info(message string, err error) error
+	Warning(message string, err error) error
+	Error(message string, err error) error
+	Fatal(message string, err error) error
 }

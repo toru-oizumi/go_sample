@@ -28,5 +28,8 @@ func (i *Initialize) AutoMigrate() error {
 	if err := i.DB.AutoMigrate(&model.ChatMessageRDBRecord{}); err != nil {
 		return err
 	}
+	if err := i.DB.AutoMigrate(&model.UserChatRDBRecord{}); err != nil {
+		return err
+	}
 	return nil
 }

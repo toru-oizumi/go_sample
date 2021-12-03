@@ -5,14 +5,15 @@ import (
 )
 
 type PlayQuery interface {
+	Exists(id model.PlayID) (bool, error)
 	FindByID(id model.PlayID) (*model.Play, error)
 	List(filter PlayFilter) ([]model.Play, error)
 }
 
 type PlayCommand interface {
 	PlayQuery
-	Store(object model.Play) (*model.Play, error)
-	Update(object model.Play) (*model.Play, error)
+	Store(object model.Play) (*model.PlayID, error)
+	Update(object model.Play) (*model.PlayID, error)
 	Delete(id model.PlayID) error
 }
 
