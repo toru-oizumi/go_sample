@@ -16,8 +16,8 @@ func AddWsRoutingGroup(e *echo.Echo, handler *ws_handler.WsHandler) {
 			func(c echo.Context) error { return handler.Chat().Handle(c) },
 		)
 		ws.GET(
-			fmt.Sprintf("/%s/:id", string(enum_connection.Play)),
-			func(c echo.Context) error { return handler.Play().Handle(c) },
+			fmt.Sprintf("/%s/:id", string(enum_connection.Field)),
+			func(c echo.Context) error { return handler.Field().Handle(c) },
 		)
 	}
 }

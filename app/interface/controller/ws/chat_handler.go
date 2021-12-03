@@ -23,7 +23,7 @@ type ChatRequest struct {
 }
 
 func (handler *ChatWsHandler) Handle(c echo.Context) error {
-	room_id := c.Param("id")
+	field_id := c.Param("id")
 	// user_idはCognito（というかJWT）から取得する想定
 	user_id := model.UserID(c.QueryParam("user_id"))
 
@@ -32,7 +32,7 @@ func (handler *ChatWsHandler) Handle(c echo.Context) error {
 		return err
 	}
 
-	if err := connectionPool.AddConnection(user_id, enum_connection.Chat, room_id, ws); err != nil {
+	if err := connectionPool.AddConnection(user_id, enum_connection.Chat, field_id, ws); err != nil {
 		return err
 	}
 
@@ -59,7 +59,7 @@ func (handler *ChatWsHandler) Handle(c echo.Context) error {
 		fmt.Println(request.SendTo[0])
 		fmt.Println(request.SendTo[1])
 
-		connectins := connectionPool.FilterConnectionsByObjective(enum_connection.Chat, room_id)
+		connectins := connectionPool.FilterConnectionsByObjective(enum_connection.Chat, field_id)
 		if err := sendMessageToConnections(connectins, v); err != nil {
 			return err
 		}

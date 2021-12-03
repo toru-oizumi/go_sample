@@ -5,14 +5,14 @@ import (
 	"go_sample/app/domain/model"
 )
 
-type PlayPresenter struct{}
+type FieldPresenter struct{}
 
-func NewPlayPresenter() PlayPresenter {
-	return PlayPresenter{}
+func NewFieldPresenter() FieldPresenter {
+	return FieldPresenter{}
 }
 
-func (p PlayPresenter) BuildPlayResponse(object model.Play) (*output.PlayResponse, error) {
-	return &output.PlayResponse{
+func (p FieldPresenter) BuildFieldResponse(object model.Field) (*output.FieldResponse, error) {
+	return &output.FieldResponse{
 		ID:            object.ID,
 		Name:          object.Name,
 		OwnerUserID:   object.OwnerUserID,
@@ -22,16 +22,16 @@ func (p PlayPresenter) BuildPlayResponse(object model.Play) (*output.PlayRespons
 	}, nil
 }
 
-func (p PlayPresenter) BuildPlaysResponse(objects []model.Play) ([]output.PlayResponse, error) {
+func (p FieldPresenter) BuildFieldsResponse(objects []model.Field) ([]output.FieldResponse, error) {
 	if objects == nil {
-		return []output.PlayResponse{}, nil
+		return []output.FieldResponse{}, nil
 	}
 
-	var result []output.PlayResponse
+	var result []output.FieldResponse
 	for _, object := range objects {
 		result = append(
 			result,
-			output.PlayResponse{
+			output.FieldResponse{
 				ID:            object.ID,
 				Name:          object.Name,
 				OwnerUserID:   object.OwnerUserID,

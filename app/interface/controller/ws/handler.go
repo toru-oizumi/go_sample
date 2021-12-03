@@ -26,6 +26,6 @@ func (h *WsHandler) Chat() *ChatWsHandler {
 	return &ChatWsHandler{}
 }
 
-func (h *WsHandler) Play() *PlayWsHandler {
-	return &PlayWsHandler{}
+func (h *WsHandler) Field() *FieldWsHandler {
+	return &FieldWsHandler{}
 }

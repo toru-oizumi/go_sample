@@ -73,8 +73,8 @@ func (con *dbConnection) User() repository.UserQuery {
 func (con *dbConnection) Group() repository.GroupQuery {
 	return &repository_impl.GroupRepository{DB: con.db, Service: con.service}
 }
-func (con *dbConnection) Play() repository.PlayQuery {
-	return &repository_impl.PlayRepository{DB: con.db, Service: con.service}
+func (con *dbConnection) Field() repository.FieldQuery {
+	return &repository_impl.FieldRepository{DB: con.db, Service: con.service}
 }
 func (con *dbConnection) Chat() repository.ChatQuery {
 	return &repository_impl.ChatRepository{DB: con.db, Service: con.service}
@@ -94,8 +94,8 @@ func (tx *dbTransaction) User() repository.UserCommand {
 func (tx *dbTransaction) Group() repository.GroupCommand {
 	return &repository_impl.GroupRepository{DB: tx.db, Service: tx.service}
 }
-func (tx *dbTransaction) Play() repository.PlayCommand {
-	return &repository_impl.PlayRepository{DB: tx.db, Service: tx.service}
+func (tx *dbTransaction) Field() repository.FieldCommand {
+	return &repository_impl.FieldRepository{DB: tx.db, Service: tx.service}
 }
 func (tx *dbTransaction) Chat() repository.ChatCommand {
 	return &repository_impl.ChatRepository{DB: tx.db, Service: tx.service}

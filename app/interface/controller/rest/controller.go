@@ -36,11 +36,11 @@ func (c *Controller) Group() *GroupController {
 	}
 }
 
-func (c *Controller) Play() *PlayController {
-	return &PlayController{
-		Usecase: &interactor.PlayInteractor{
+func (c *Controller) Field() *FieldController {
+	return &FieldController{
+		Usecase: &interactor.FieldInteractor{
 			Connection: c.connection,
-			Presenter:  presenter_impl.NewPlayPresenter(),
+			Presenter:  presenter_impl.NewFieldPresenter(),
 		},
 	}
 }

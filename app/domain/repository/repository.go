@@ -19,7 +19,7 @@ type Initialize interface {
 type Query interface {
 	User() UserQuery
 	Group() GroupQuery
-	Play() PlayQuery
+	Field() FieldQuery
 	Chat() ChatQuery
 	ChatMessage() ChatMessageQuery
 }
@@ -27,7 +27,7 @@ type Query interface {
 type Transaction interface {
 	User() UserCommand
 	Group() GroupCommand
-	Play() PlayCommand
+	Field() FieldCommand
 	Chat() ChatCommand
 	ChatMessage() ChatMessageCommand
 }

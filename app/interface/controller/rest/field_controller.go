@@ -8,13 +8,13 @@ import (
 	"net/http"
 )
 
-type PlayController struct {
-	Usecase usecase.PlayUsecase
+type FieldController struct {
+	Usecase usecase.FieldUsecase
 	Logger  logger.RestApiLogger
 }
 
-func (ctrl *PlayController) Find(c context.Context) error {
-	request := new(input.FindPlayByIDRequest)
+func (ctrl *FieldController) Find(c context.Context) error {
+	request := new(input.FindFieldByIDRequest)
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)
@@ -30,7 +30,7 @@ func (ctrl *PlayController) Find(c context.Context) error {
 	}
 }
 
-func (ctrl *PlayController) FindAll(c context.Context) error {
+func (ctrl *FieldController) FindAll(c context.Context) error {
 	if users, err := ctrl.Usecase.FindAll(); err != nil {
 		return c.CreateErrorResponse(err)
 	} else {
@@ -38,8 +38,8 @@ func (ctrl *PlayController) FindAll(c context.Context) error {
 	}
 }
 
-func (ctrl *PlayController) Create(c context.Context) error {
-	request := new(input.CreatePlayRequest)
+func (ctrl *FieldController) Create(c context.Context) error {
+	request := new(input.CreateFieldRequest)
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)
@@ -55,8 +55,8 @@ func (ctrl *PlayController) Create(c context.Context) error {
 	}
 }
 
-func (ctrl *PlayController) Update(c context.Context) error {
-	request := new(input.UpdatePlayRequest)
+func (ctrl *FieldController) Update(c context.Context) error {
+	request := new(input.UpdateFieldRequest)
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)
@@ -72,8 +72,8 @@ func (ctrl *PlayController) Update(c context.Context) error {
 	}
 }
 
-func (ctrl *PlayController) Delete(c context.Context) error {
-	request := new(input.DeletePlayRequest)
+func (ctrl *FieldController) Delete(c context.Context) error {
+	request := new(input.DeleteFieldRequest)
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)

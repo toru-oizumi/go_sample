@@ -59,7 +59,7 @@ func Init() {
 
 	rest_router.AddUsersRoutingGroup(e, controller)
 	rest_router.AddGroupsRoutingGroup(e, controller)
-	rest_router.AddPlaysRoutingGroup(e, controller)
+	rest_router.AddFieldsRoutingGroup(e, controller)
 	rest_router.AddChatsRoutingGroup(e, controller)
 
 	ws_router.AddWsRoutingGroup(e, ws_handler)

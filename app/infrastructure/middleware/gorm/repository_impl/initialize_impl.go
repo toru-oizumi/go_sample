@@ -19,7 +19,7 @@ func (i *Initialize) AutoMigrate() error {
 	if err := i.DB.AutoMigrate(&model.GroupRDBRecord{}); err != nil {
 		return err
 	}
-	if err := i.DB.AutoMigrate(&model.PlayRDBRecord{}); err != nil {
+	if err := i.DB.AutoMigrate(&model.FieldRDBRecord{}); err != nil {
 		return err
 	}
 	if err := i.DB.AutoMigrate(&model.ChatRDBRecord{}); err != nil {

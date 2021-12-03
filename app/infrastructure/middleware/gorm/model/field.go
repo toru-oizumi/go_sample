@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type PlayRDBRecord struct {
+type FieldRDBRecord struct {
 	ID            string `gorm:"type:varchar(255);primarykey"`
 	Name          string `gorm:"type:varchar(255);unique;not null"`
 	OwnerUserID   string
@@ -19,14 +19,14 @@ type PlayRDBRecord struct {
 	DeletedAt     gorm.DeletedAt `gorm:"index"` // gormのデフォルトに則って設定しているが、基本物理削除するので使わない想定
 }
 
-func (PlayRDBRecord) TableName() string {
-	return "plays"
+func (FieldRDBRecord) TableName() string {
+	return "fields"
 }
 
-func (r *PlayRDBRecord) ToDomain() (*model.Play, error) {
-	group := model.Play{
-		ID:            model.PlayID(r.ID),
-		Name:          model.PlayName(r.Name),
+func (r *FieldRDBRecord) ToDomain() (*model.Field, error) {
+	group := model.Field{
+		ID:            model.FieldID(r.ID),
+		Name:          model.FieldName(r.Name),
 		OwnerUserID:   model.UserID(r.OwnerUserID),
 		VisitorUserID: model.UserID(r.VisitorUserID),
 		CreatedAt:     r.CreatedAt,
@@ -40,8 +40,8 @@ func (r *PlayRDBRecord) ToDomain() (*model.Play, error) {
 	return &group, nil
 }
 
-func (r *PlayRDBRecord) FromDomain(d model.Play) PlayRDBRecord {
-	return PlayRDBRecord{
+func (r *FieldRDBRecord) FromDomain(d model.Field) FieldRDBRecord {
+	return FieldRDBRecord{
 		ID:            string(d.ID),
 		Name:          string(d.Name),
 		OwnerUserID:   string(d.OwnerUserID),

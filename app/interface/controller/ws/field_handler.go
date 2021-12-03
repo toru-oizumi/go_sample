@@ -12,17 +12,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type PlayWsHandler struct {
+type FieldWsHandler struct {
 	Logger logger.WsApiLogger
 }
 
-type PlayRequest struct {
+type FieldRequest struct {
 	Aaa string `json:"aaa"`
 	Bbb int    `json:"bbb"`
 	Ccc bool   `json:"ccc"`
 }
 
-func (handler *PlayWsHandler) Handle(c echo.Context) error {
+func (handler *FieldWsHandler) Handle(c echo.Context) error {
 	id := c.Param("id")
 	// user_idはCognito（というかJWT）から取得する想定
 	user_id := model.UserID(c.QueryParam("user_id"))
@@ -32,11 +32,11 @@ func (handler *PlayWsHandler) Handle(c echo.Context) error {
 		return err
 	}
 
-	if err := connectionPool.AddConnection(user_id, enum_connection.Play, id, ws); err != nil {
+	if err := connectionPool.AddConnection(user_id, enum_connection.Field, id, ws); err != nil {
 		return err
 	}
 
-	defer connectionPool.RemoveConnection(user_id, enum_connection.Play)
+	defer connectionPool.RemoveConnection(user_id, enum_connection.Field)
 
 	for {
 		// Read
@@ -48,13 +48,13 @@ func (handler *PlayWsHandler) Handle(c echo.Context) error {
 			return err
 		}
 
-		request := new(PlayRequest)
+		request := new(FieldRequest)
 		json.Unmarshal(p, &request)
 
 		// Write
 		v, _ := json.Marshal(request)
 
-		connectins := connectionPool.FilterConnectionsByObjective(enum_connection.Play, id)
+		connectins := connectionPool.FilterConnectionsByObjective(enum_connection.Field, id)
 		if err := sendMessageToConnections(connectins, v); err != nil {
 			return err
 		}
