@@ -26,11 +26,6 @@ func (r *ChatRDBRecord) ToDomain() (*model.Chat, error) {
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
 	}
-
-	err := chat.Validate()
-	if err != nil {
-		return nil, err
-	}
 	return &chat, nil
 }
 

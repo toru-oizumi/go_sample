@@ -34,11 +34,6 @@ func (r *UserRDBRecord) ToDomain() (*model.User, error) {
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
 	}
-
-	err = user.Validate()
-	if err != nil {
-		return nil, err
-	}
 	return &user, nil
 }
 

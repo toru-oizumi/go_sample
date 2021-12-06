@@ -23,7 +23,7 @@ type ChatMessageRepository struct {
 func (repo *ChatMessageRepository) Exists(id model.ChatMessageID) (bool, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 
-	if err := repo.DB.Select("`id`").Take(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
+	if err := repo.DB.Select("`id`").Take(&db_chat_message, "`chat_messages`.`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
@@ -35,7 +35,7 @@ func (repo *ChatMessageRepository) Exists(id model.ChatMessageID) (bool, error) 
 func (repo *ChatMessageRepository) FindByID(id model.ChatMessageID) (*model.ChatMessage, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 
-	if err := repo.DB.Take(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
+	if err := repo.DB.Joins("CreatedBy").Take(&db_chat_message, "`chat_messages`.`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
 		}
@@ -53,7 +53,7 @@ func (repo *ChatMessageRepository) List(filter repository.ChatMessageFilter) ([]
 	db_chat_messages := []db_model.ChatMessageRDBRecord{}
 	chat_messages := []model.ChatMessage{}
 
-	if err := repo.DB.Find(&db_chat_messages, "`chat_id` = ?", string(filter.ChatID)).Error; err != nil {
+	if err := repo.DB.Joins("CreatedBy").Find(&db_chat_messages, "`chat_id` = ?", string(filter.ChatID)).Error; err != nil {
 		return nil, err
 	} else {
 		for _, v := range db_chat_messages {

@@ -32,7 +32,7 @@ type ChatMessage struct {
 	ID           ChatMessageID `json:"chatMessageID" validate:"required"`
 	ChatID       ChatID        `json:"chatID" validate:"required"`
 	CreatedAt    time.Time     `json:"createdAt" validate:"required"`
-	CreatedBy    UserID        `json:"createdBy" validate:"required"`
+	CreatedBy    User          `json:"createdBy"`
 	Body         ChatBody      `json:"body" validate:"required"`
 	IsPrivileged bool          `json:"isPrivileged"`
 	UpdatedAt    time.Time     `json:"updatedAt" validate:"required"`

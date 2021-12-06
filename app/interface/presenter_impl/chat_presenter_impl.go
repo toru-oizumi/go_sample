@@ -54,10 +54,13 @@ func (p ChatPresenter) BuildChatMembersResponse(objects []model.UserID) (output.
 
 func (p ChatPresenter) BuildChatMessageResponse(object model.ChatMessage) (*output.ChatMessageResponse, error) {
 	return &output.ChatMessageResponse{
-		ID:           object.ID,
-		ChatID:       object.ChatID,
-		CreatedAt:    object.CreatedAt,
-		CreatedBy:    object.CreatedBy,
+		ID:        object.ID,
+		ChatID:    object.ChatID,
+		CreatedAt: object.CreatedAt,
+		CreatedBy: output.ChatMessageCreatedByResponse{
+			ID:   object.CreatedBy.ID,
+			Name: object.CreatedBy.Name,
+		},
 		Body:         object.Body,
 		IsPrivileged: object.IsPrivileged,
 		UpdatedAt:    object.UpdatedAt,
@@ -74,10 +77,13 @@ func (p ChatPresenter) BuildChatMessagesResponse(objects []model.ChatMessage) ([
 		result = append(
 			result,
 			output.ChatMessageResponse{
-				ID:           object.ID,
-				ChatID:       object.ChatID,
-				CreatedAt:    object.CreatedAt,
-				CreatedBy:    object.CreatedBy,
+				ID:        object.ID,
+				ChatID:    object.ChatID,
+				CreatedAt: object.CreatedAt,
+				CreatedBy: output.ChatMessageCreatedByResponse{
+					ID:   object.CreatedBy.ID,
+					Name: object.CreatedBy.Name,
+				},
 				Body:         object.Body,
 				IsPrivileged: object.IsPrivileged,
 				UpdatedAt:    object.UpdatedAt,

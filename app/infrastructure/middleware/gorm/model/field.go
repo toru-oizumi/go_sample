@@ -32,11 +32,6 @@ func (r *FieldRDBRecord) ToDomain() (*model.Field, error) {
 		CreatedAt:     r.CreatedAt,
 		UpdatedAt:     r.UpdatedAt,
 	}
-
-	err := group.Validate()
-	if err != nil {
-		return nil, err
-	}
 	return &group, nil
 }
 

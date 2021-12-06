@@ -58,7 +58,7 @@ func (i *ChatInteractor) CreateMessage(request input.CreateChatMessageRequest) (
 
 	chat_message := model.ChatMessage{
 		ChatID:       request.ChatID,
-		CreatedBy:    request.UserID,
+		CreatedBy:    model.User{ID: request.UserID},
 		Body:         request.Message,
 		IsPrivileged: false,
 	}
@@ -94,14 +94,14 @@ func (i *ChatInteractor) UpdateMessage(request input.UpdateChatMessageRequest) (
 		return nil, util_error.NewErrBadRequest("invalid ChatID")
 	}
 
-	if message.CreatedBy != request.UserID {
+	if message.CreatedBy.ID != request.UserID {
 		return nil, util_error.NewErrBadRequest("invalid UserID")
 	}
 
 	chat_message := model.ChatMessage{
 		ID:        request.ChatMessageID,
 		ChatID:    request.ChatID,
-		CreatedBy: request.UserID,
+		CreatedBy: model.User{ID: request.UserID},
 		Body:      request.Message,
 	}
 
@@ -151,7 +151,7 @@ func (i *ChatInteractor) DeleteMessage(request input.DeleteChatMessageRequest) (
 		return nil, util_error.NewErrBadRequest("invalid ChatID")
 	}
 
-	if message.CreatedBy != request.UserID {
+	if message.CreatedBy.ID != request.UserID {
 		return nil, util_error.NewErrBadRequest("invalid UserID")
 	}
 
