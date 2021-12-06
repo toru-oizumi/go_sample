@@ -40,6 +40,18 @@ func (p ChatPresenter) BuildChatsResponse(objects []model.Chat) ([]output.ChatRe
 	return result, nil
 }
 
+func (p ChatPresenter) BuildChatMembersResponse(objects []model.UserID) (output.ChatMembersResponse, error) {
+	var result output.ChatMembersResponse
+	if objects == nil {
+		return result, nil
+	}
+
+	for _, object := range objects {
+		result = append(result, object)
+	}
+	return result, nil
+}
+
 func (p ChatPresenter) BuildChatMessageResponse(object model.ChatMessage) (*output.ChatMessageResponse, error) {
 	return &output.ChatMessageResponse{
 		ID:           object.ID,
@@ -73,4 +85,11 @@ func (p ChatPresenter) BuildChatMessagesResponse(objects []model.ChatMessage) ([
 		)
 	}
 	return result, nil
+}
+
+func (p ChatPresenter) BuildDeletedChatMessageResponse(object model.ChatMessage) (*output.DeletedChatMessageResponse, error) {
+	return &output.DeletedChatMessageResponse{
+		ChatID:        object.ChatID,
+		ChatMessageID: object.ID,
+	}, nil
 }

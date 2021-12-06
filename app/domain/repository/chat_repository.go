@@ -9,6 +9,8 @@ type ChatQuery interface {
 	FindByID(id model.ChatID) (*model.Chat, error)
 	FindByName(name model.ChatName) (*model.Chat, error)
 	List(filter ChatFilter) ([]model.Chat, error)
+	FindMembersByID(id model.ChatID) ([]model.UserID, error)
+	DoseJoinChat(user_id model.UserID, chat_id model.ChatID) (bool, error)
 }
 
 type ChatCommand interface {

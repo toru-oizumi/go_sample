@@ -17,12 +17,12 @@ const FreeGroupName = GroupName("free")
 type GroupNumberOfMembers uint
 
 type Group struct {
-	ID              GroupID              `validate:"required"`
-	Name            GroupName            `validate:"required"`
-	NumberOfMembers GroupNumberOfMembers `validate:"numeric"`
-	Chat            Chat
-	CreatedAt       time.Time `validate:"required"`
-	UpdatedAt       time.Time `validate:"required"`
+	ID              GroupID              `json:"groupID" validate:"required"`
+	Name            GroupName            `json:"name" validate:"required"`
+	NumberOfMembers GroupNumberOfMembers `json:"numberOfMembers" validate:"numeric"`
+	Chat            Chat                 `json:"chat"`
+	CreatedAt       time.Time            `json:"createdAt" validate:"required"`
+	UpdatedAt       time.Time            `json:"updatedAt" validate:"required"`
 }
 
 func (m *Group) CanAddMember() bool {

@@ -138,11 +138,7 @@ func (i *GroupInteractor) Delete(request input.DeleteGroupRequest) error {
 			domain_service := service.NewDomainService(tx)
 
 			err := domain_service.Group.Delete(request.ID)
-			if err != nil {
-				return nil, err
-			}
-
-			return nil, nil
+			return nil, err
 		},
 	)
 

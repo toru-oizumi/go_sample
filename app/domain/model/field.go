@@ -11,12 +11,12 @@ type FieldID string
 type FieldName string
 
 type Field struct {
-	ID            FieldID `validate:"required"`
-	Name          FieldName
-	OwnerUserID   UserID    `validate:"required"`
-	VisitorUserID UserID    `validate:"required"`
-	CreatedAt     time.Time `validate:"required"`
-	UpdatedAt     time.Time `validate:"required"`
+	ID            FieldID   `json:"fieldID" validate:"required"`
+	Name          FieldName `json:"name"`
+	OwnerUserID   UserID    `json:"ownerUserID" validate:"required"`
+	VisitorUserID UserID    `json:"visitorUserID" validate:"required"`
+	CreatedAt     time.Time `json:"createdAt" validate:"required"`
+	UpdatedAt     time.Time `json:"updatedAt" validate:"required"`
 }
 
 func (m *Field) Validate() error {

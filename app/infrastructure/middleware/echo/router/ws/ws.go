@@ -2,22 +2,22 @@ package router
 
 import (
 	"fmt"
-	ws_handler "go_sample/app/interface/controller/ws"
+	ws_controller "go_sample/app/interface/controller/ws"
 	enum_connection "go_sample/app/interface/controller/ws/enum/connection"
 
 	"github.com/labstack/echo/v4"
 )
 
-func AddWsRoutingGroup(e *echo.Echo, handler *ws_handler.WsHandler) {
+func AddWsRoutingGroup(e *echo.Echo, ctrl *ws_controller.WsControllerr) {
 	ws := e.Group("ws")
 	{
 		ws.GET(
-			fmt.Sprintf("/%s/:id", string(enum_connection.Chat)),
-			func(c echo.Context) error { return handler.Chat().Handle(c) },
+			fmt.Sprintf("/%s", string(enum_connection.Chat)),
+			func(c echo.Context) error { return ctrl.Chat().Handle(c) },
 		)
 		ws.GET(
-			fmt.Sprintf("/%s/:id", string(enum_connection.Field)),
-			func(c echo.Context) error { return handler.Field().Handle(c) },
+			fmt.Sprintf("/%s", string(enum_connection.Field)),
+			func(c echo.Context) error { return ctrl.Field().Handle(c) },
 		)
 	}
 }

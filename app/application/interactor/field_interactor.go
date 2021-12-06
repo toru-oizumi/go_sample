@@ -98,11 +98,8 @@ func (i *FieldInteractor) Delete(request input.DeleteFieldRequest) error {
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.Field().Delete(request.ID); err != nil {
-				return nil, err
-			} else {
-				return nil, nil
-			}
+			err := tx.Field().Delete(request.ID)
+			return nil, err
 		},
 	); err != nil {
 		return err

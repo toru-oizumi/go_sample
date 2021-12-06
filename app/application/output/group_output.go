@@ -7,9 +7,9 @@ import (
 )
 
 type GroupResponse struct {
-	ID              model.GroupID              `validate:"required"`
-	Name            model.GroupName            `validate:"required"`
-	NumberOfMembers model.GroupNumberOfMembers `validate:"numeric"`
-	CreatedAt       time.Time                  `validate:"required"`
-	UpdatedAt       time.Time                  `validate:"required"`
+	ID              model.GroupID              `json:"groupID" validate:"required"`
+	Name            model.GroupName            `json:"name" validate:"required"`
+	NumberOfMembers model.GroupNumberOfMembers `json:"numberOfMembers" validate:"numeric"`
+	CreatedAt       time.Time                  `json:"createdAt" validate:"required"`
+	UpdatedAt       time.Time                  `json:"updatedAt" validate:"required"`
 }

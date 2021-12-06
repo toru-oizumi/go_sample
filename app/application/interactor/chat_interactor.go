@@ -19,17 +19,31 @@ func (i *ChatInteractor) FindAll(request input.FindChatsRequest) ([]output.ChatR
 	if chats, err := i.Connection.Chat().List(repository.ChatFilter{UserID: request.UserID}); err != nil {
 		return nil, err
 	} else {
-		// 取得したchatのリストに、全体向けchat(AllChatName)を加える
-		if chat_for_all, err := i.Connection.Chat().FindByName(model.AllChatName); err != nil {
-			return nil, err
-		} else {
-			chats = append(chats, *chat_for_all)
-			return i.Presenter.BuildChatsResponse(chats)
-		}
+		return i.Presenter.BuildChatsResponse(chats)
 	}
 }
 
-func (i *ChatInteractor) FindMessages(request input.FindChatMessagesByIDRequest) ([]output.ChatMessageResponse, error) {
+func (i *ChatInteractor) FindChatMembers(request input.FindChatMembersRequest) (output.ChatMembersResponse, error) {
+	if members, err := i.Connection.Chat().FindMembersByID(request.ChatID); err != nil {
+		return nil, err
+	} else {
+		return i.Presenter.BuildChatMembersResponse(members)
+	}
+}
+
+func (i *ChatInteractor) FindMessages(request input.FindChatMessagesRequest) ([]output.ChatMessageResponse, error) {
+	if ok, _ := i.Connection.Chat().Exists(request.ChatID); !ok {
+		return nil, util_error.NewErrRecordNotFound()
+	}
+
+	if ok, err := i.Connection.Chat().DoseJoinChat(request.UserID, request.ChatID); err != nil {
+		return nil, err
+	} else {
+		if !ok {
+			return nil, util_error.NewErrBadRequest("dose not join this chat")
+		}
+	}
+
 	if messages, err := i.Connection.ChatMessage().List(repository.ChatMessageFilter{ChatID: request.ChatID}); err != nil {
 		return nil, err
 	} else {
@@ -38,6 +52,10 @@ func (i *ChatInteractor) FindMessages(request input.FindChatMessagesByIDRequest)
 }
 
 func (i *ChatInteractor) CreateMessage(request input.CreateChatMessageRequest) (*output.ChatMessageResponse, error) {
+	if ok, _ := i.Connection.Chat().Exists(request.ChatID); !ok {
+		return nil, util_error.NewErrRecordNotFound()
+	}
+
 	chat_message := model.ChatMessage{
 		ChatID:       request.ChatID,
 		CreatedBy:    request.UserID,
@@ -47,11 +65,16 @@ func (i *ChatInteractor) CreateMessage(request input.CreateChatMessageRequest) (
 
 	if created_chat_message, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if created_chat_message, err := tx.ChatMessage().Store(chat_message); err != nil {
+			created_chat_message_id, err := tx.ChatMessage().Store(chat_message)
+			if err != nil {
 				return nil, err
-			} else {
-				return created_chat_message, nil
 			}
+
+			created_chat_message, err := tx.ChatMessage().FindByID(*created_chat_message_id)
+			if err != nil {
+				return nil, err
+			}
+			return *created_chat_message, nil
 		},
 	); err != nil {
 		return nil, err
@@ -62,6 +85,19 @@ func (i *ChatInteractor) CreateMessage(request input.CreateChatMessageRequest) (
 }
 
 func (i *ChatInteractor) UpdateMessage(request input.UpdateChatMessageRequest) (*output.ChatMessageResponse, error) {
+	message, err := i.Connection.ChatMessage().FindByID(request.ChatMessageID)
+	if err != nil {
+		return nil, err
+	}
+
+	if message.ChatID != request.ChatID {
+		return nil, util_error.NewErrBadRequest("invalid ChatID")
+	}
+
+	if message.CreatedBy != request.UserID {
+		return nil, util_error.NewErrBadRequest("invalid UserID")
+	}
+
 	chat_message := model.ChatMessage{
 		ID:        request.ChatMessageID,
 		ChatID:    request.ChatID,
@@ -71,11 +107,16 @@ func (i *ChatInteractor) UpdateMessage(request input.UpdateChatMessageRequest) (
 
 	if updated_chat_message, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if updated_chat_message, err := tx.ChatMessage().Update(chat_message); err != nil {
+			updated_chat_message_id, err := tx.ChatMessage().Update(chat_message)
+			if err != nil {
 				return nil, err
-			} else {
-				return updated_chat_message, nil
 			}
+
+			updated_chat_message, err := tx.ChatMessage().FindByID(*updated_chat_message_id)
+			if err != nil {
+				return nil, err
+			}
+			return *updated_chat_message, nil
 		},
 	); err != nil {
 		return nil, err
@@ -85,25 +126,43 @@ func (i *ChatInteractor) UpdateMessage(request input.UpdateChatMessageRequest) (
 	}
 }
 
-func (i *ChatInteractor) DeleteMessage(request input.DeleteChatMessageRequest) error {
-	if _, err := i.Connection.ChatMessage().FindByID(request.ChatMessageID); err != nil {
+func (i *ChatInteractor) DeleteMessage(request input.DeleteChatMessageRequest) (*output.DeletedChatMessageResponse, error) {
+	// 返す結果はRepositoryから取得した結果に依存しないので、先にrequestから生成しておく
+	result, err := i.Presenter.BuildDeletedChatMessageResponse(
+		model.ChatMessage{
+			ID:     request.ChatMessageID,
+			ChatID: request.ChatID,
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	message, err := i.Connection.ChatMessage().FindByID(request.ChatMessageID)
+	if err != nil {
 		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
 		if errors.As(err, &util_error.ErrRecordNotFound{}) {
-			return nil
+
+			return result, nil
 		}
-		return err
+		return nil, err
 	}
+
+	if message.ChatID != request.ChatID {
+		return nil, util_error.NewErrBadRequest("invalid ChatID")
+	}
+
+	if message.CreatedBy != request.UserID {
+		return nil, util_error.NewErrBadRequest("invalid UserID")
+	}
+
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.ChatMessage().Delete(request.ChatMessageID); err != nil {
-				return nil, err
-			} else {
-				return nil, nil
-			}
+			err := tx.ChatMessage().Delete(request.ChatMessageID)
+			return nil, err
 		},
 	); err != nil {
-		return err
+		return nil, err
 	} else {
-		return nil
+		return result, nil
 	}
 }

@@ -86,6 +86,31 @@ func (repo *ChatRepository) List(filter repository.ChatFilter) ([]model.Chat, er
 	}
 }
 
+func (repo *ChatRepository) FindMembersByID(id model.ChatID) ([]model.UserID, error) {
+	var db_user_chats []db_model.UserChatRDBRecord
+	var members []model.UserID
+	if err := repo.DB.Find(&db_user_chats, "`chat_id` = ?", string(id)).Error; err != nil {
+		return nil, err
+	}
+
+	for _, v := range db_user_chats {
+		members = append(members, model.UserID(v.UserID))
+	}
+	return members, nil
+}
+
+func (repo *ChatRepository) DoseJoinChat(user_id model.UserID, chat_id model.ChatID) (bool, error) {
+	var db_user_chat db_model.UserChatRDBRecord
+
+	if err := repo.DB.Select("`user_id`").Where("`user_id` = ?", string(user_id)).Where("`chat_id` = ?", string(chat_id)).Take(&db_user_chat).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (repo *ChatRepository) Store(object model.Chat) (*model.ChatID, error) {
 	var db_chat db_model.ChatRDBRecord
 	db_chat = db_chat.FromDomain(object)

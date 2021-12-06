@@ -11,8 +11,9 @@ import (
 
 type ChatUsecase interface {
 	FindAll(request input.FindChatsRequest) ([]output.ChatResponse, error)
-	FindMessages(request input.FindChatMessagesByIDRequest) ([]output.ChatMessageResponse, error)
+	FindChatMembers(request input.FindChatMembersRequest) (output.ChatMembersResponse, error)
+	FindMessages(request input.FindChatMessagesRequest) ([]output.ChatMessageResponse, error)
 	CreateMessage(request input.CreateChatMessageRequest) (*output.ChatMessageResponse, error)
 	UpdateMessage(request input.UpdateChatMessageRequest) (*output.ChatMessageResponse, error)
-	DeleteMessage(request input.DeleteChatMessageRequest) error
+	DeleteMessage(request input.DeleteChatMessageRequest) (*output.DeletedChatMessageResponse, error)
 }

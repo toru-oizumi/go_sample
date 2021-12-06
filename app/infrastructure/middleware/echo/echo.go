@@ -12,7 +12,7 @@ import (
 	"go_sample/app/infrastructure/middleware/zap"
 
 	rest_controller "go_sample/app/interface/controller/rest"
-	ws_handler "go_sample/app/interface/controller/ws"
+	ws_controller "go_sample/app/interface/controller/ws"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -36,10 +36,13 @@ func Init() {
 
 	logger := zap.NewZapApiResponseLogger()
 
-	controller := rest_controller.NewController(connection)
-	ws_handler := ws_handler.NewWsHandler(connection)
+	rest_ctrl := rest_controller.NewController(connection)
+	ws_ctrl := ws_controller.NewWsHandler(connection)
 
 	// 認証を行う
+	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+	// 	SigningKey: []byte("secret"),
+	// }))
 	// TODO: 最終的にはJWTの検証としたい
 	// e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
 	// 	// return key == "valid-key", nil
@@ -57,12 +60,12 @@ func Init() {
 		}
 	})
 
-	rest_router.AddUsersRoutingGroup(e, controller)
-	rest_router.AddGroupsRoutingGroup(e, controller)
-	rest_router.AddFieldsRoutingGroup(e, controller)
-	rest_router.AddChatsRoutingGroup(e, controller)
+	rest_router.AddUsersRoutingGroup(e, rest_ctrl)
+	rest_router.AddGroupsRoutingGroup(e, rest_ctrl)
+	rest_router.AddFieldsRoutingGroup(e, rest_ctrl)
+	rest_router.AddChatsRoutingGroup(e, rest_ctrl)
 
-	ws_router.AddWsRoutingGroup(e, ws_handler)
+	ws_router.AddWsRoutingGroup(e, ws_ctrl)
 
 	e.Logger.Fatal(e.Start(":18080"))
 }

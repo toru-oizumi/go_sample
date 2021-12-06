@@ -3,7 +3,6 @@ package controller
 import (
 	"go_sample/app/application/input"
 	"go_sample/app/application/usecase"
-	"go_sample/app/domain/model"
 	"go_sample/app/interface/controller/context"
 	"net/http"
 )
@@ -30,8 +29,9 @@ func (ctrl *ChatController) FindAll(c context.Context) error {
 }
 
 func (ctrl *ChatController) FindMessages(c context.Context) error {
-	request := new(input.FindChatMessagesByIDRequest)
-	request.UserID = model.UserID(c.QueryParam("user_id"))
+	request := new(input.FindChatMessagesRequest)
+	// request.ChatID = model.ChatID(c.Param("chat_id"))
+	// request.UserID = model.UserID(c.QueryParam("userID"))
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)

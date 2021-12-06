@@ -2,7 +2,6 @@ package repository
 
 import (
 	"go_sample/app/domain/model"
-	"time"
 )
 
 type ChatMessageQuery interface {
@@ -16,10 +15,10 @@ type ChatMessageCommand interface {
 	Store(object model.ChatMessage) (*model.ChatMessageID, error)
 	Update(object model.ChatMessage) (*model.ChatMessageID, error)
 	Delete(id model.ChatMessageID) error
+	DeleteByChatID(chat_id model.ChatID) error
 }
 
 type ChatMessageFilter struct {
-	ChatID      model.ChatID
-	CreatedAtGt time.Time
-	CreatedAtLt time.Time
+	UserID model.UserID
+	ChatID model.ChatID
 }

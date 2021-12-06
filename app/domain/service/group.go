@@ -112,6 +112,10 @@ func (s *groupService) Delete(id model.GroupID) error {
 		return err
 	}
 
-	// TODO ?? Group向けChatMessageの削除
+	// Group向けChatMessageの削除
+	if err := s.tx.ChatMessage().DeleteByChatID(group.Chat.ID); err != nil {
+		return err
+	}
+
 	return nil
 }

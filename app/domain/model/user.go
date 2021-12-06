@@ -13,11 +13,11 @@ type UserName string
 type UserAge uint
 
 type User struct {
-	ID        UserID   `validate:"required"`
-	Name      UserName `validate:"required"`
-	Group     Group
-	CreatedAt time.Time `validate:"required"`
-	UpdatedAt time.Time `validate:"required"`
+	ID        UserID    `json:"userID" validate:"required"`
+	Name      UserName  `json:"name" validate:"required"`
+	Group     Group     `json:"group"`
+	CreatedAt time.Time `json:"createdAt" validate:"required"`
+	UpdatedAt time.Time `json:"updatedAt" validate:"required"`
 }
 
 func (m *User) Validate() error {

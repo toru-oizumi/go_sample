@@ -17,10 +17,10 @@ const AllChatName = ChatName("all")
 type ChatBody string
 
 type Chat struct {
-	ID        ChatID    `validate:"required"`
-	Name      ChatName  `validate:"required"`
-	CreatedAt time.Time `validate:"required"`
-	UpdatedAt time.Time `validate:"required"`
+	ID        ChatID    `json:"chatID" validate:"required"`
+	Name      ChatName  `json:"name" validate:"required"`
+	CreatedAt time.Time `json:"createdAt" validate:"required"`
+	UpdatedAt time.Time `json:"updatedAt" validate:"required"`
 }
 
 func (m *Chat) Validate() error {
@@ -29,13 +29,13 @@ func (m *Chat) Validate() error {
 }
 
 type ChatMessage struct {
-	ID           ChatMessageID `validate:"required"`
-	ChatID       ChatID        `validate:"required"`
-	CreatedAt    time.Time     `validate:"required"`
-	CreatedBy    UserID        `validate:"required"`
-	Body         ChatBody      `validate:"required"`
-	IsPrivileged bool          `validate:"required"`
-	UpdatedAt    time.Time     `validate:"required"`
+	ID           ChatMessageID `json:"chatMessageID" validate:"required"`
+	ChatID       ChatID        `json:"chatID" validate:"required"`
+	CreatedAt    time.Time     `json:"createdAt" validate:"required"`
+	CreatedBy    UserID        `json:"createdBy" validate:"required"`
+	Body         ChatBody      `json:"body" validate:"required"`
+	IsPrivileged bool          `json:"isPrivileged"`
+	UpdatedAt    time.Time     `json:"updatedAt" validate:"required"`
 }
 
 func (m *ChatMessage) Validate() error {

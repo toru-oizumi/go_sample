@@ -53,8 +53,7 @@ func (repo *ChatMessageRepository) List(filter repository.ChatMessageFilter) ([]
 	db_chat_messages := []db_model.ChatMessageRDBRecord{}
 	chat_messages := []model.ChatMessage{}
 
-	// TODO filterを使う
-	if err := repo.DB.Find(&db_chat_messages).Error; err != nil {
+	if err := repo.DB.Find(&db_chat_messages, "`chat_id` = ?", string(filter.ChatID)).Error; err != nil {
 		return nil, err
 	} else {
 		for _, v := range db_chat_messages {
@@ -91,14 +90,12 @@ func (repo *ChatMessageRepository) Store(object model.ChatMessage) (*model.ChatM
 func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.ChatMessageID, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 
-	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_chat_message, string(object.ID)).Error; err != nil {
+	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_chat_message, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
 		}
 		return nil, err
 	}
-
-	// TODO: ChatIDとUserIDのチェック
 	db_chat_message.Body = string(object.Body)
 
 	if err := repo.DB.Save(&db_chat_message).Error; err != nil {
@@ -115,15 +112,16 @@ func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.Chat
 
 func (repo *ChatMessageRepository) Delete(id model.ChatMessageID) error {
 	var db_chat_message db_model.ChatMessageRDBRecord
-	if err := repo.DB.Take(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return util_error.NewErrRecordNotFound()
-		}
+	if err := repo.DB.Unscoped().Delete(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
 		return err
 	}
 
-	// TODO: ChatIDとUserIDのチェック
-	if err := repo.DB.Unscoped().Delete(&db_chat_message).Error; err != nil {
+	return nil
+}
+
+func (repo *ChatMessageRepository) DeleteByChatID(chat_id model.ChatID) error {
+	var db_chat_message db_model.ChatMessageRDBRecord
+	if err := repo.DB.Unscoped().Delete(&db_chat_message, "`chat_id` = ?", string(chat_id)).Error; err != nil {
 		return err
 	}
 
