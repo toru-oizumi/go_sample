@@ -105,3 +105,30 @@ func (s *userService) LeaveGroup(user model.User) error {
 
 	return err
 }
+
+// User削除に関連する処理をまとめたservice
+func (s *userService) Delete(user model.User) error {
+	if err := s.tx.User().Delete(user.ID); err != nil {
+		return err
+	}
+
+	// Userが所属していたGroupのNumberOfMembersを減らす
+	if err := s.tx.Group().DecreaseNumberOfMembers(user.Group.ID, 1); err != nil {
+		return err
+	}
+
+	// UserのChatMessageを削除
+	if err := s.tx.ChatMessage().DeleteByCreatedByID(user.ID); err != nil {
+		return err
+	}
+
+	// DirectMessageを削除
+	if err := s.tx.DirectMessage().DeleteByFromUserID(user.ID); err != nil {
+		return err
+	}
+	if err := s.tx.DirectMessage().DeleteByToUserID(user.ID); err != nil {
+		return err
+	}
+
+	return nil
+}

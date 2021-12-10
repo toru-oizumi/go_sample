@@ -64,6 +64,7 @@ func Init() {
 	rest_router.AddGroupsRoutingGroup(e, rest_ctrl)
 	rest_router.AddFieldsRoutingGroup(e, rest_ctrl)
 	rest_router.AddChatsRoutingGroup(e, rest_ctrl)
+	rest_router.AddDirectMessagesRoutingGroup(e, rest_ctrl)
 
 	ws_router.AddWsRoutingGroup(e, ws_ctrl)
 

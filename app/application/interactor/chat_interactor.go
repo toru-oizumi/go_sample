@@ -56,31 +56,31 @@ func (i *ChatInteractor) CreateMessage(request input.CreateChatMessageRequest) (
 		return nil, util_error.NewErrRecordNotFound()
 	}
 
-	chat_message := model.ChatMessage{
+	message := model.ChatMessage{
 		ChatID:       request.ChatID,
 		CreatedBy:    model.User{ID: request.UserID},
 		Body:         request.Message,
 		IsPrivileged: false,
 	}
 
-	if created_chat_message, err := i.Connection.RunTransaction(
+	if created_message, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			created_chat_message_id, err := tx.ChatMessage().Store(chat_message)
+			created_message_id, err := tx.ChatMessage().Store(message)
 			if err != nil {
 				return nil, err
 			}
 
-			created_chat_message, err := tx.ChatMessage().FindByID(*created_chat_message_id)
+			created_message, err := tx.ChatMessage().FindByID(*created_message_id)
 			if err != nil {
 				return nil, err
 			}
-			return *created_chat_message, nil
+			return *created_message, nil
 		},
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_chat_message, _ := created_chat_message.(model.ChatMessage)
-		return i.Presenter.BuildChatMessageResponse(parsed_chat_message)
+		parsed_message, _ := created_message.(model.ChatMessage)
+		return i.Presenter.BuildChatMessageResponse(parsed_message)
 	}
 }
 
@@ -98,31 +98,26 @@ func (i *ChatInteractor) UpdateMessage(request input.UpdateChatMessageRequest) (
 		return nil, util_error.NewErrBadRequest("invalid UserID")
 	}
 
-	chat_message := model.ChatMessage{
-		ID:        request.ChatMessageID,
-		ChatID:    request.ChatID,
-		CreatedBy: model.User{ID: request.UserID},
-		Body:      request.Message,
-	}
+	message.Body = request.Message
 
-	if updated_chat_message, err := i.Connection.RunTransaction(
+	if updated_message, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			updated_chat_message_id, err := tx.ChatMessage().Update(chat_message)
+			updated_message_id, err := tx.ChatMessage().Update(*message)
 			if err != nil {
 				return nil, err
 			}
 
-			updated_chat_message, err := tx.ChatMessage().FindByID(*updated_chat_message_id)
+			updated_message, err := tx.ChatMessage().FindByID(*updated_message_id)
 			if err != nil {
 				return nil, err
 			}
-			return *updated_chat_message, nil
+			return *updated_message, nil
 		},
 	); err != nil {
 		return nil, err
 	} else {
-		parsed_chat_message, _ := updated_chat_message.(model.ChatMessage)
-		return i.Presenter.BuildChatMessageResponse(parsed_chat_message)
+		parsed_message, _ := updated_message.(model.ChatMessage)
+		return i.Presenter.BuildChatMessageResponse(parsed_message)
 	}
 }
 

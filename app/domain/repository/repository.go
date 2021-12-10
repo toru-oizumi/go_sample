@@ -22,6 +22,7 @@ type Query interface {
 	Field() FieldQuery
 	Chat() ChatQuery
 	ChatMessage() ChatMessageQuery
+	DirectMessage() DirectMessageQuery
 }
 
 type Transaction interface {
@@ -30,4 +31,5 @@ type Transaction interface {
 	Field() FieldCommand
 	Chat() ChatCommand
 	ChatMessage() ChatMessageCommand
+	DirectMessage() DirectMessageCommand
 }

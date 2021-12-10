@@ -136,16 +136,9 @@ func (i *UserInteractor) Delete(request input.DeleteUserRequest) error {
 
 	if _, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {
-			if err := tx.User().Delete(request.ID); err != nil {
-				return nil, err
-			}
-
-			// Userが所属していたGroupのNumberOfMembersを減らす
-			if err := tx.Group().DecreaseNumberOfMembers(user.Group.ID, 1); err != nil {
-				return nil, err
-			}
-
-			return nil, nil
+			domain_service := service.NewDomainService(tx)
+			err := domain_service.User.Delete(*user)
+			return nil, err
 		},
 	); err != nil {
 		return err

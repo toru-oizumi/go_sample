@@ -29,21 +29,21 @@ import (
 // 取得したUserIDリストからConnectionリストを取得する
 // 取得したConnectionリスト宛にメッセージを送信する
 
-type ChatWsControllerr struct {
-	Usecase usecase.ChatUsecase
+type DirectMessageWsControllerr struct {
+	Usecase usecase.DirectMessageUsecase
 }
 
-type WsChatRequest struct {
+type WsDirectMessageRequest struct {
+	Process  enum_process.ChatProcess `json:"process"`
+	ToUserID model.UserID             `json:"toUserID"`
+}
+
+type WsDirectMessageResponse struct {
 	Process enum_process.ChatProcess `json:"process"`
-	ChatID  model.ChatID             `json:"chatID"`
+	Message interface{}              `json:"directMessage"`
 }
 
-type WsChatResponse struct {
-	Process enum_process.ChatProcess `json:"process"`
-	Message interface{}              `json:"chatMessage"`
-}
-
-func (ctrl *ChatWsControllerr) Handle(c echo.Context) error {
+func (ctrl *DirectMessageWsControllerr) Handle(c echo.Context) error {
 	// user_idはCognito（というかJWT）から取得する想定
 	headers := c.Request().Header[http.CanonicalHeaderKey("authorization")]
 	dummy_jwt := strings.Replace(headers[0], "Bearer ", "", 1)
@@ -75,17 +75,16 @@ func (ctrl *ChatWsControllerr) Handle(c echo.Context) error {
 		// TODO: エラーの返し方
 		// TODO: バリデーションどうするか？
 
-		request := new(WsChatRequest)
+		request := new(WsDirectMessageRequest)
 		json.Unmarshal(body, &request)
 
 		var result []byte
 		switch request.Process {
 		case enum_process.Add:
-			chat_req := new(input.CreateChatMessageRequest)
-			json.Unmarshal(body, &chat_req)
-			chat_req.UserID = user_id
-			chat_req.ChatID = request.ChatID
-			if message, err := ctrl.Usecase.CreateMessage(*chat_req); err != nil {
+			direct_message_req := new(input.CreateDirectMessageRequest)
+			json.Unmarshal(body, &direct_message_req)
+			direct_message_req.FromUserID = user_id
+			if message, err := ctrl.Usecase.CreateMessage(*direct_message_req); err != nil {
 				return err
 			} else {
 				result, _ = json.Marshal(
@@ -95,11 +94,10 @@ func (ctrl *ChatWsControllerr) Handle(c echo.Context) error {
 					})
 			}
 		case enum_process.Modify:
-			chat_req := new(input.UpdateChatMessageRequest)
-			json.Unmarshal(body, &chat_req)
-			chat_req.UserID = user_id
-			chat_req.ChatID = request.ChatID
-			if message, err := ctrl.Usecase.UpdateMessage(*chat_req); err != nil {
+			direct_message_req := new(input.UpdateDirectMessageRequest)
+			json.Unmarshal(body, &direct_message_req)
+			direct_message_req.FromUserID = user_id
+			if message, err := ctrl.Usecase.UpdateMessage(*direct_message_req); err != nil {
 				return err
 			} else {
 				result, _ = json.Marshal(
@@ -109,11 +107,10 @@ func (ctrl *ChatWsControllerr) Handle(c echo.Context) error {
 					})
 			}
 		case enum_process.Delete:
-			chat_req := new(input.DeleteChatMessageRequest)
-			json.Unmarshal(body, &chat_req)
-			chat_req.UserID = user_id
-			chat_req.ChatID = request.ChatID
-			if message, err := ctrl.Usecase.DeleteMessage(*chat_req); err != nil {
+			direct_message_req := new(input.DeleteDirectMessageRequest)
+			json.Unmarshal(body, &direct_message_req)
+			direct_message_req.FromUserID = user_id
+			if message, err := ctrl.Usecase.DeleteMessage(*direct_message_req); err != nil {
 				return err
 			} else {
 				result, _ = json.Marshal(
@@ -127,13 +124,8 @@ func (ctrl *ChatWsControllerr) Handle(c echo.Context) error {
 			return nil
 		}
 
-		sendUserIDs, err := ctrl.Usecase.FindChatMembers(input.FindChatMembersRequest{ChatID: request.ChatID})
-		if err != nil {
-			// TODO: エラーの返し方
-			return err
-		}
-
-		connectins := connectionPool.FilterConnectionsByUserIDs(sendUserIDs)
+		ids := []model.UserID{user_id, request.ToUserID}
+		connectins := connectionPool.FilterConnectionsByUserIDs(ids)
 		if err := sendMessageToConnections(connectins, result); err != nil {
 			return err
 		}

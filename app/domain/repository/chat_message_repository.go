@@ -16,6 +16,7 @@ type ChatMessageCommand interface {
 	Update(object model.ChatMessage) (*model.ChatMessageID, error)
 	Delete(id model.ChatMessageID) error
 	DeleteByChatID(chat_id model.ChatID) error
+	DeleteByCreatedByID(user_id model.UserID) error
 }
 
 type ChatMessageFilter struct {

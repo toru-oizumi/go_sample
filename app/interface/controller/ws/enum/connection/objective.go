@@ -3,6 +3,7 @@ package connection
 type Objective string
 
 const (
-	Chat  = Objective("chat")
-	Field = Objective("field")
+	Chat          = Objective("chat")
+	DirectMessage = Objective("direct-message")
+	Field         = Objective("field")
 )

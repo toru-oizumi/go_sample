@@ -23,7 +23,7 @@ type ChatMessageRepository struct {
 func (repo *ChatMessageRepository) Exists(id model.ChatMessageID) (bool, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 
-	if err := repo.DB.Select("`id`").Take(&db_chat_message, "`chat_messages`.`id` = ?", string(id)).Error; err != nil {
+	if err := repo.DB.Select("`id`").Take(&db_chat_message, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
@@ -35,6 +35,7 @@ func (repo *ChatMessageRepository) Exists(id model.ChatMessageID) (bool, error) 
 func (repo *ChatMessageRepository) FindByID(id model.ChatMessageID) (*model.ChatMessage, error) {
 	var db_chat_message db_model.ChatMessageRDBRecord
 
+	// ToDo Join使わない方が良いか…
 	if err := repo.DB.Joins("CreatedBy").Take(&db_chat_message, "`chat_messages`.`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, util_error.NewErrRecordNotFound()
@@ -53,6 +54,7 @@ func (repo *ChatMessageRepository) List(filter repository.ChatMessageFilter) ([]
 	db_chat_messages := []db_model.ChatMessageRDBRecord{}
 	chat_messages := []model.ChatMessage{}
 
+	// ToDo Join使わない方が良いか…
 	if err := repo.DB.Joins("CreatedBy").Find(&db_chat_messages, "`chat_id` = ?", string(filter.ChatID)).Error; err != nil {
 		return nil, err
 	} else {
@@ -122,6 +124,15 @@ func (repo *ChatMessageRepository) Delete(id model.ChatMessageID) error {
 func (repo *ChatMessageRepository) DeleteByChatID(chat_id model.ChatID) error {
 	var db_chat_message db_model.ChatMessageRDBRecord
 	if err := repo.DB.Unscoped().Delete(&db_chat_message, "`chat_id` = ?", string(chat_id)).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *ChatMessageRepository) DeleteByCreatedByID(user_id model.UserID) error {
+	var db_chat_message db_model.ChatMessageRDBRecord
+	if err := repo.DB.Unscoped().Delete(&db_chat_message, "`created_by_id` = ?", string(user_id)).Error; err != nil {
 		return err
 	}
 

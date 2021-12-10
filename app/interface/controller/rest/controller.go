@@ -53,3 +53,12 @@ func (c *Controller) Chat() *ChatController {
 		},
 	}
 }
+
+func (c *Controller) DirectMessage() *DirectMessageController {
+	return &DirectMessageController{
+		Usecase: &interactor.DirectMessageInteractor{
+			Connection: c.connection,
+			Presenter:  presenter_impl.NewDirectMessagePresenter(),
+		},
+	}
+}

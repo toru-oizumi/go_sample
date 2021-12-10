@@ -30,8 +30,6 @@ func (ctrl *ChatController) FindAll(c context.Context) error {
 
 func (ctrl *ChatController) FindMessages(c context.Context) error {
 	request := new(input.FindChatMessagesRequest)
-	// request.ChatID = model.ChatID(c.Param("chat_id"))
-	// request.UserID = model.UserID(c.QueryParam("userID"))
 
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)

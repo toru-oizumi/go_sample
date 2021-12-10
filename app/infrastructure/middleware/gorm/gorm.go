@@ -82,6 +82,9 @@ func (con *dbConnection) Chat() repository.ChatQuery {
 func (con *dbConnection) ChatMessage() repository.ChatMessageQuery {
 	return &repository_impl.ChatMessageRepository{DB: con.db, Service: con.service}
 }
+func (con *dbConnection) DirectMessage() repository.DirectMessageQuery {
+	return &repository_impl.DirectMessageRepository{DB: con.db, Service: con.service}
+}
 
 type dbTransaction struct {
 	db      *gorm.DB
@@ -102,4 +105,7 @@ func (tx *dbTransaction) Chat() repository.ChatCommand {
 }
 func (tx *dbTransaction) ChatMessage() repository.ChatMessageCommand {
 	return &repository_impl.ChatMessageRepository{DB: tx.db, Service: tx.service}
+}
+func (tx *dbTransaction) DirectMessage() repository.DirectMessageCommand {
+	return &repository_impl.DirectMessageRepository{DB: tx.db, Service: tx.service}
 }

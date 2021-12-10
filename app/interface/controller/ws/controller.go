@@ -41,3 +41,12 @@ func (c *WsControllerr) Field() *FieldWsControllerr {
 		},
 	}
 }
+
+func (c *WsControllerr) DirectMessage() *DirectMessageWsControllerr {
+	return &DirectMessageWsControllerr{
+		Usecase: &interactor.DirectMessageInteractor{
+			Connection: c.connection,
+			Presenter:  presenter_impl.NewDirectMessagePresenter(),
+		},
+	}
+}

@@ -13,13 +13,13 @@ type GroupQuery interface {
 
 type GroupCommand interface {
 	GroupQuery
-	// Interactor(Usecase)内で使用する場合は、service.CreateGroupの使用を推奨
+	// Interactor(Usecase)内で使用する場合は、groupService.Createの使用を推奨
 	Store(object model.Group) (*model.GroupID, error)
-	// Interactor(Usecase)内で使用する場合は、service.UpdateGroupの使用を推奨
+	// Interactor(Usecase)内で使用する場合は、groupService.Updateの使用を推奨
 	Update(object model.Group) (*model.GroupID, error)
 	IncreaseNumberOfMembers(id model.GroupID, num uint) error
 	DecreaseNumberOfMembers(id model.GroupID, num uint) error
-	// Interactor(Usecase)内で使用する場合は、service.DeleteGroupの使用を推奨
+	// Interactor(Usecase)内で使用する場合は、groupService.Deleteの使用を推奨
 	Delete(id model.GroupID) error
 }
 

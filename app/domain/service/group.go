@@ -63,9 +63,6 @@ func (s *groupService) Update(group model.Group) (*model.GroupID, error) {
 
 // Group削除に関連する処理をまとめたservice
 func (s *groupService) Delete(id model.GroupID) error {
-	// Userのチャット所属をfreeに
-	// UserのGroupをgroup_for_free
-
 	group_for_free, err := s.tx.Group().FindByName(model.FreeGroupName)
 	if err != nil {
 		return err

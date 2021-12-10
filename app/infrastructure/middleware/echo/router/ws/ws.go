@@ -16,6 +16,10 @@ func AddWsRoutingGroup(e *echo.Echo, ctrl *ws_controller.WsControllerr) {
 			func(c echo.Context) error { return ctrl.Chat().Handle(c) },
 		)
 		ws.GET(
+			fmt.Sprintf("/%s", string(enum_connection.DirectMessage)),
+			func(c echo.Context) error { return ctrl.DirectMessage().Handle(c) },
+		)
+		ws.GET(
 			fmt.Sprintf("/%s", string(enum_connection.Field)),
 			func(c echo.Context) error { return ctrl.Field().Handle(c) },
 		)
