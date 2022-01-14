@@ -37,7 +37,7 @@ func Init() {
 	logger := zap.NewZapApiResponseLogger()
 
 	rest_ctrl := rest_controller.NewController(connection)
-	ws_ctrl := ws_controller.NewWsHandler(connection)
+	ws_ctrl := ws_controller.NewWsController(connection)
 
 	// 認証を行う
 	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{

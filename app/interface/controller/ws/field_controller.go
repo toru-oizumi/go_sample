@@ -1,70 +1,51 @@
-package handler
+package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"go_sample/app/application/usecase"
 	"go_sample/app/domain/model"
 
-	"github.com/labstack/echo/v4"
-
-	"github.com/gorilla/websocket"
+	"go_sample/app/interface/controller/ws/enum/process"
+	"go_sample/app/interface/controller/ws/enum/resource"
+	util_error "go_sample/app/utility/error"
 )
 
 type FieldWsControllerr struct {
 	Usecase usecase.FieldUsecase
 }
 
-type FieldRequest struct {
-	Aaa string `json:"aaa"`
-	Bbb int    `json:"bbb"`
-	Ccc bool   `json:"ccc"`
+type FieldWsRequest struct {
+	Resource resource.Resource `json:"resource"`
+	Process  process.Process   `json:"process"`
 }
 
-func (handler *FieldWsControllerr) Handle(c echo.Context) error {
-	// user_idはCognito（というかJWT）から取得する想定
-	user_id := model.UserID(c.QueryParam("userID"))
-	// TODO: UserIDの存在確認
+type FieldWsResponse struct {
+	Resource resource.Resource `json:"resource"`
+	Process  process.Process   `json:"process"`
+	Message  interface{}       `json:"fieldMessage"`
+}
 
-	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-	if err != nil {
-		return err
+func (ctrl *FieldWsControllerr) Handle(user_id model.UserID, message []byte) ([]model.UserID, []byte, error) {
+	request := new(FieldWsRequest)
+	json.Unmarshal(message, &request)
+
+	res := FieldWsResponse{
+		Resource: request.Resource,
+		Process:  request.Process,
 	}
 
-	connectionPool.AddConnection(user_id, ws)
-
-	defer connectionPool.RemoveConnection(user_id)
-
-	for {
-		chat_id := model.ChatID(c.Param("id"))
-		// TODO: chat_idの存在確認
-		// TODO: 送信先 UserIDのリスト作成
-		var sendUserIDs []model.UserID
-		sendUserIDs = append(sendUserIDs, user_id)
-
-		// Read
-		messageType, p, err := ws.ReadMessage()
-		if messageType != websocket.TextMessage {
-			// TODO: Binaryは受け入れらませんerror
-			return err
-		}
-		if err != nil {
-			// TODO: それ以外のエラー
-			return err
-		}
-
-		request := new(WsChatRequest)
-		request.ChatID = chat_id
-		json.Unmarshal(p, &request)
-
-		// Write
-		v, _ := json.Marshal(request)
-
-		fmt.Println(request.Process)
-
-		connectins := connectionPool.FilterConnectionsByUserIDs(sendUserIDs)
-		if err := sendMessageToConnections(connectins, v); err != nil {
-			return err
-		}
+	switch request.Process {
+	case process.Add:
+		result, _ := json.Marshal(res)
+		return []model.UserID{}, result, nil
+	case process.Modify:
+		result, _ := json.Marshal(res)
+		return []model.UserID{}, result, nil
+	case process.Delete:
+		result, _ := json.Marshal(res)
+		return []model.UserID{}, result, nil
+	default:
+		// TODO: エラーの返し方
+		return nil, nil, util_error.NewErrBadRequest("")
 	}
 }
