@@ -9,8 +9,8 @@ import (
 )
 
 func AddDirectMessagesRoutingGroup(e *echo.Echo, ctrl *rest_controller.Controller) {
-	chats := e.Group("direct-messages")
+	messages := e.Group("direct-messages")
 	{
-		chats.GET("", func(c echo.Context) error { return ctrl.DirectMessage().FindAll(c.(*context.CustomContext)) })
+		messages.GET("", func(c echo.Context) error { return ctrl.DirectMessage().FindAll(c.(*context.CustomContext)) })
 	}
 }

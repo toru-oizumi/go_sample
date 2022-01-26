@@ -15,6 +15,8 @@ func NewApiError(err error) ApiError {
 	switch err.(type) {
 	case util_error.ErrValidationError:
 		httpStatusCode = http.StatusBadRequest
+	case util_error.ErrUnauthorized:
+		httpStatusCode = http.StatusUnauthorized
 	case util_error.ErrRecordNotFound:
 		httpStatusCode = http.StatusNotFound
 	case util_error.ErrRecordDuplicate:

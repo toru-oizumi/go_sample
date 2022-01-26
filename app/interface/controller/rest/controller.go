@@ -18,6 +18,15 @@ func NewController(
 	}
 }
 
+func (c *Controller) Authentication() *AuthenticationController {
+	return &AuthenticationController{
+		Usecase: &interactor.AuthenticationInteractor{
+			Connection: c.connection,
+			Presenter:  presenter_impl.NewAuthenticationPresenter(),
+		},
+	}
+}
+
 func (c *Controller) User() *UserController {
 	return &UserController{
 		Usecase: &interactor.UserInteractor{

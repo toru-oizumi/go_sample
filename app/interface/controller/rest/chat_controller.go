@@ -12,8 +12,11 @@ type ChatController struct {
 }
 
 func (ctrl *ChatController) FindAll(c context.Context) error {
-	request := new(input.FindChatsRequest)
+	if err := c.CheckSession(); err != nil {
+		return c.CreateErrorResponse(err)
+	}
 
+	request := new(input.FindChatsRequest)
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)
 	}
@@ -29,8 +32,11 @@ func (ctrl *ChatController) FindAll(c context.Context) error {
 }
 
 func (ctrl *ChatController) FindMessages(c context.Context) error {
-	request := new(input.FindChatMessagesRequest)
+	if err := c.CheckSession(); err != nil {
+		return c.CreateErrorResponse(err)
+	}
 
+	request := new(input.FindChatMessagesRequest)
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)
 	}

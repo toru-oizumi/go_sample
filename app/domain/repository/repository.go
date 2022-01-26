@@ -17,6 +17,7 @@ type Initialize interface {
 }
 
 type Query interface {
+	Account() AccountQuery
 	User() UserQuery
 	Group() GroupQuery
 	Field() FieldQuery
@@ -26,6 +27,7 @@ type Query interface {
 }
 
 type Transaction interface {
+	Account() AccountCommand
 	User() UserCommand
 	Group() GroupCommand
 	Field() FieldCommand

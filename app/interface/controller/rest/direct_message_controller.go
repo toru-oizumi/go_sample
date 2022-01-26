@@ -12,8 +12,11 @@ type DirectMessageController struct {
 }
 
 func (ctrl *DirectMessageController) FindAll(c context.Context) error {
-	request := new(input.FindDirectMessagesRequest)
+	if err := c.CheckSession(); err != nil {
+		return c.CreateErrorResponse(err)
+	}
 
+	request := new(input.FindDirectMessagesRequest)
 	if err := c.Bind(request); err != nil {
 		return c.CreateErrorResponse(err)
 	}

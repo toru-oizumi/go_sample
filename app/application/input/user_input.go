@@ -5,7 +5,7 @@ import (
 )
 
 type FindUserByIDRequest struct {
-	ID model.UserID `param:"id" validate:"required,alphanum"`
+	ID model.UserID `param:"id" validate:"required,ascii"`
 }
 
 type FindUsersRequest struct {
@@ -18,7 +18,7 @@ type CreateUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	ID      model.UserID   `param:"id" validate:"required,alphanum"`
+	ID      model.UserID   `param:"id" validate:"required,ascii"`
 	Name    model.UserName `json:"name" form:"name" validate:"required"`
 	GroupID model.GroupID  `json:"groupID" form:"groupID" validate:"required,alphanum"`
 }

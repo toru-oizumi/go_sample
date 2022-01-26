@@ -7,14 +7,18 @@ import (
 )
 
 type Config struct {
+	SessionKey    string `required:"true" split_words:"true"`
+	RunServerPort string `required:"true" split_words:"true"`
+
 	DBUser     string `required:"true" split_words:"true"`
 	DBPassword string `required:"true" split_words:"true"`
 	DBHost     string `required:"true" split_words:"true"`
 	DBPort     string `required:"true" split_words:"true"`
 	DBName     string `required:"true" split_words:"true"`
 
-	FreeGroupName string
-	AllChatName   string
+	AwsDefaultRegion   string `required:"true" split_words:"true"`
+	AwsCognitoPoolID   string `required:"true" split_words:"true"`
+	AwsCognitoClientID string `required:"true" split_words:"true"`
 }
 
 func LoadConfig() Config {
