@@ -31,6 +31,18 @@ func (repo *UserRepository) Exists(id model.UserID) (bool, error) {
 	return true, nil
 }
 
+func (repo *UserRepository) ExistsByName(name model.UserName) (bool, error) {
+	var db_user db_model.UserRDBRecord
+
+	if err := repo.DB.Select("`id`").Take(&db_user, "`name` = ?", string(name)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (repo *UserRepository) FindByID(id model.UserID) (*model.User, error) {
 	var db_user db_model.UserRDBRecord
 
@@ -41,7 +53,7 @@ func (repo *UserRepository) FindByID(id model.UserID) (*model.User, error) {
 		string(id),
 	).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("UserID")
 		}
 		return nil, err
 	}
@@ -96,7 +108,7 @@ func (repo *UserRepository) Store(object model.User) (*model.UserID, error) {
 
 	if err := repo.DB.Create(&db_user).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -111,7 +123,7 @@ func (repo *UserRepository) Update(object model.User) (*model.UserID, error) {
 
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_user, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("UserID")
 		}
 		return nil, err
 	}
@@ -120,7 +132,7 @@ func (repo *UserRepository) Update(object model.User) (*model.UserID, error) {
 
 	if err := repo.DB.Save(&db_user).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}

@@ -54,7 +54,9 @@ type WsRequest struct {
 }
 
 func (ctrl *WsControllerr) Handle(c echo.Context) error {
-	// user_idはCognito（というかJWT）から取得する想定
+	// TODO: WebSocketの認証どうしよう。。。
+	// https://nykergoto.hatenablog.jp/entry/2021/05/12/Websocket_%E3%81%AE%E8%AA%8D%E8%A8%BC_%28Authentication%29_%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E3%83%A1%E3%83%A2
+	// 実装方法が悩ましい
 	headers := c.Request().Header[http.CanonicalHeaderKey("authorization")]
 	dummy_jwt := strings.Replace(headers[0], "Bearer ", "", 1)
 	user_id := model.UserID(dummy_jwt)

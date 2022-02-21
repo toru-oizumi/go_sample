@@ -14,6 +14,7 @@ func AddAuthenticationRoutingGroup(e *echo.Echo, ctrl *rest_controller.Controlle
 		authentications.POST("/sign-in", func(c echo.Context) error { return ctrl.Authentication().SingIn(c.(*context.CustomContext)) })
 		authentications.POST("/sign-up", func(c echo.Context) error { return ctrl.Authentication().SingUp(c.(*context.CustomContext)) })
 		authentications.POST("/activate", func(c echo.Context) error { return ctrl.Authentication().Activate(c.(*context.CustomContext)) })
+		authentications.POST("/change-password", func(c echo.Context) error { return ctrl.Authentication().ChangePassword(c.(*context.CustomContext)) })
 		authentications.DELETE("/sign-out", func(c echo.Context) error { return ctrl.Authentication().SingOut(c.(*context.CustomContext)) })
 	}
 }

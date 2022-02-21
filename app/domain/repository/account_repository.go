@@ -15,6 +15,7 @@ type AccountCommand interface {
 	// Interactor(Usecase)内で使用する場合は、userService.Createの使用を推奨
 	Store(object model.Account) (*model.UserID, error)
 	Activate(email model.Email, currentPassword model.Password, newPassword model.Password) error
+	ChangePassword(email model.Email, currentPassword model.Password, newPassword model.Password) error
 	Update(object model.Account) (*model.UserID, error)
 	Enable(id model.UserID) error
 	Disable(id model.UserID) error

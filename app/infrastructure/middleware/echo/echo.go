@@ -47,6 +47,12 @@ func Init() {
 	rest_ctrl := rest_controller.NewController(connection)
 	ws_ctrl := ws_controller.NewWsController(connection)
 
+	if config.Environment == "local" {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowCredentials: true,
+		}))
+	}
+
 	// CustomContextを使用する
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

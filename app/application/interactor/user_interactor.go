@@ -128,7 +128,7 @@ func (i *UserInteractor) Delete(request input.DeleteUserRequest) error {
 	user, err := i.Connection.User().FindByID(request.ID)
 	if err != nil {
 		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
-		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+		if errors.As(err, &util_error.ErrEntityNotExists{}) {
 			return nil
 		}
 		return err

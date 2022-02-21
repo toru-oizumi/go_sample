@@ -1,15 +1,14 @@
 package error
 
 type ErrBadRequest struct {
-	Message string
-}
-
-func (e ErrBadRequest) Error() string {
-	return e.Message
+	customError
 }
 
 func NewErrBadRequest(message string) ErrBadRequest {
 	return ErrBadRequest{
-		Message: message,
+		customError{
+			Title:   "bad_request",
+			Message: message,
+		},
 	}
 }

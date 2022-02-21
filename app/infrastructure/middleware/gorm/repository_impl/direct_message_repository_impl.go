@@ -38,7 +38,7 @@ func (repo *DirectMessageRepository) FindByID(id model.DirectMessageID) (*model.
 	// ToDo Join使わない方が良いか…
 	if err := repo.DB.Joins("FromUser").Joins("ToUser").Take(&db_direct_message, "`direct_messages`.`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("DirectMessageID")
 		}
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (repo *DirectMessageRepository) Store(object model.DirectMessage) (*model.D
 
 	if err := repo.DB.Create(&db_direct_message).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -94,7 +94,7 @@ func (repo *DirectMessageRepository) Update(object model.DirectMessage) (*model.
 
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_direct_message, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("DirectMessageID")
 		}
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (repo *DirectMessageRepository) Update(object model.DirectMessage) (*model.
 
 	if err := repo.DB.Save(&db_direct_message).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}

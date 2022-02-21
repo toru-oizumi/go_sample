@@ -6,6 +6,7 @@ import (
 
 type UserQuery interface {
 	Exists(id model.UserID) (bool, error)
+	ExistsByName(name model.UserName) (bool, error)
 	FindByID(id model.UserID) (*model.User, error)
 	List(filter UserFilter) ([]model.User, error)
 }

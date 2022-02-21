@@ -90,7 +90,7 @@ func (i *FieldInteractor) Update(request input.UpdateFieldRequest) (*output.Fiel
 func (i *FieldInteractor) Delete(request input.DeleteFieldRequest) error {
 	if _, err := i.Connection.Field().FindByID(request.ID); err != nil {
 		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
-		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+		if errors.As(err, &util_error.ErrEntityNotExists{}) {
 			return nil
 		}
 		return err

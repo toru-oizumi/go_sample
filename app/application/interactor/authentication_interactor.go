@@ -1,12 +1,14 @@
 package interactor
 
 import (
+	"errors"
 	"go_sample/app/application/input"
 	"go_sample/app/application/output"
 	"go_sample/app/application/presenter"
 	"go_sample/app/domain/model"
 	"go_sample/app/domain/repository"
 	"go_sample/app/domain/service"
+	util_error "go_sample/app/utility/error"
 )
 
 type AuthenticationInteractor struct {
@@ -16,7 +18,11 @@ type AuthenticationInteractor struct {
 
 func (i *AuthenticationInteractor) SingIn(request input.SignInRequest) (*output.AuthenticationResponse, error) {
 	if err := i.Connection.Account().Authenticate(request.Email, request.Password); err != nil {
-		return nil, err
+		if errors.As(err, &util_error.ErrEntityNotExists{}) {
+			return nil, util_error.NewErrAuthenticationFailed()
+		} else {
+			return nil, err
+		}
 	}
 
 	account, err := i.Connection.Account().FindByEmail(request.Email)
@@ -34,6 +40,13 @@ func (i *AuthenticationInteractor) SingIn(request input.SignInRequest) (*output.
 func (i *AuthenticationInteractor) SignUp(request input.SignUpRequest) (*output.AuthenticationResponse, error) {
 	user := model.User{
 		Name: request.Name,
+	}
+
+	exists, err := i.Connection.User().ExistsByName(user.Name)
+	if err != nil {
+		return nil, err
+	} else if exists {
+		return nil, util_error.NewErrEntityAlreadyExists()
 	}
 
 	created_user, err := i.Connection.RunTransaction(
@@ -84,17 +97,14 @@ func (i *AuthenticationInteractor) Activate(request input.ActivateRequest) (*out
 			if err := tx.Account().Activate(request.Email, request.CurrentPassword, request.NewPassword); err != nil {
 				return nil, err
 			}
-
 			account, err := tx.Account().FindByEmail(request.Email)
 			if err != nil {
 				return nil, err
 			}
-
 			activated_user, err := tx.User().FindByID(account.ID)
 			if err != nil {
 				return nil, err
 			}
-
 			return *activated_user, nil
 		},
 	)
@@ -104,6 +114,32 @@ func (i *AuthenticationInteractor) Activate(request input.ActivateRequest) (*out
 	}
 
 	parsed_user, _ := activated_user.(model.User)
+	return i.Presenter.BuildAuthenticationResponse(parsed_user)
+}
+
+func (i *AuthenticationInteractor) ChangePassword(request input.ChangePasswordRequest) (*output.AuthenticationResponse, error) {
+	changed_user, err := i.Connection.RunTransaction(
+		func(tx repository.Transaction) (interface{}, error) {
+			if err := tx.Account().ChangePassword(request.Email, request.CurrentPassword, request.NewPassword); err != nil {
+				return nil, err
+			}
+			account, err := tx.Account().FindByEmail(request.Email)
+			if err != nil {
+				return nil, err
+			}
+			changed_user, err := tx.User().FindByID(account.ID)
+			if err != nil {
+				return nil, err
+			}
+			return *changed_user, nil
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	parsed_user, _ := changed_user.(model.User)
 	return i.Presenter.BuildAuthenticationResponse(parsed_user)
 }
 

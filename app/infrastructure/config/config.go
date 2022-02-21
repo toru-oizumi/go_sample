@@ -7,6 +7,8 @@ import (
 )
 
 type Config struct {
+	Environment string `required:"true" split_words:"true"`
+
 	SessionKey    string `required:"true" split_words:"true"`
 	RunServerPort string `required:"true" split_words:"true"`
 

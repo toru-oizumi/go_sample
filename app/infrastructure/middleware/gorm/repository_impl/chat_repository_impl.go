@@ -30,12 +30,24 @@ func (repo *ChatRepository) Exists(id model.ChatID) (bool, error) {
 	return true, nil
 }
 
+func (repo *ChatRepository) ExistsByName(name model.ChatName) (bool, error) {
+	var db_chat db_model.ChatRDBRecord
+
+	if err := repo.DB.Select("`id`").Take(&db_chat, "`name` = ?", string(name)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (repo *ChatRepository) FindByID(id model.ChatID) (*model.Chat, error) {
 	var db_chat db_model.ChatRDBRecord
 
 	if err := repo.DB.Take(&db_chat, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("ChatID")
 		}
 		return nil, err
 	}
@@ -52,7 +64,7 @@ func (repo *ChatRepository) FindByName(name model.ChatName) (*model.Chat, error)
 
 	if err := repo.DB.Take(&db_chat, "`name` = ?", string(name)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("ChatName")
 		}
 		return nil, err
 	}
@@ -121,7 +133,7 @@ func (repo *ChatRepository) Store(object model.Chat) (*model.ChatID, error) {
 
 	if err := repo.DB.Create(&db_chat).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -136,7 +148,7 @@ func (repo *ChatRepository) Update(object model.Chat) (*model.ChatID, error) {
 
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_chat, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("ChatID")
 		}
 		return nil, err
 	}
@@ -145,7 +157,7 @@ func (repo *ChatRepository) Update(object model.Chat) (*model.ChatID, error) {
 
 	if err := repo.DB.Save(&db_chat).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -163,7 +175,7 @@ func (repo *ChatRepository) Join(userID model.UserID, chatID model.ChatID) error
 
 	if err := repo.DB.Create(&db_user_chat).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return util_error.NewErrRecordDuplicate()
+			return util_error.NewErrEntityAlreadyExists()
 		} else {
 			return err
 		}
@@ -190,7 +202,7 @@ func (repo *ChatRepository) Leave(userID model.UserID, chatID model.ChatID) erro
 	var db_user_chat db_model.UserChatRDBRecord
 	if err := repo.DB.Where("`user_id` = ?", string(userID)).Where("`chat_id` = ?", string(chatID)).Take(&db_user_chat).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return util_error.NewErrRecordNotFound()
+			return util_error.NewErrEntityNotExists("ChatID")
 		}
 		return err
 	}

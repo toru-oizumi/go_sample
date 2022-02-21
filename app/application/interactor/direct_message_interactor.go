@@ -103,7 +103,7 @@ func (i *DirectMessageInteractor) DeleteMessage(request input.DeleteDirectMessag
 	message, err := i.Connection.DirectMessage().FindByID(request.ID)
 	if err != nil {
 		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
-		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+		if errors.As(err, &util_error.ErrEntityNotExists{}) {
 
 			return result, nil
 		}

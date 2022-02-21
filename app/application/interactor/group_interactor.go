@@ -127,7 +127,7 @@ func (i *GroupInteractor) Update(request input.UpdateGroupRequest) (*output.Grou
 func (i *GroupInteractor) Delete(request input.DeleteGroupRequest) error {
 	if _, err := i.Connection.Group().FindByID(request.ID); err != nil {
 		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
-		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+		if errors.As(err, &util_error.ErrEntityNotExists{}) {
 			return nil
 		}
 		return err

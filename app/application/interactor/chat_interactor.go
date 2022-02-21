@@ -33,7 +33,7 @@ func (i *ChatInteractor) FindChatMembers(request input.FindChatMembersRequest) (
 
 func (i *ChatInteractor) FindMessages(request input.FindChatMessagesRequest) ([]output.ChatMessageResponse, error) {
 	if ok, _ := i.Connection.Chat().Exists(request.ChatID); !ok {
-		return nil, util_error.NewErrRecordNotFound()
+		return nil, util_error.NewErrEntityNotExists("ChatID")
 	}
 
 	if ok, err := i.Connection.Chat().DoseJoinChat(request.UserID, request.ChatID); err != nil {
@@ -53,7 +53,7 @@ func (i *ChatInteractor) FindMessages(request input.FindChatMessagesRequest) ([]
 
 func (i *ChatInteractor) CreateMessage(request input.CreateChatMessageRequest) (*output.ChatMessageResponse, error) {
 	if ok, _ := i.Connection.Chat().Exists(request.ChatID); !ok {
-		return nil, util_error.NewErrRecordNotFound()
+		return nil, util_error.NewErrEntityNotExists("ChatID")
 	}
 
 	message := model.ChatMessage{
@@ -135,7 +135,7 @@ func (i *ChatInteractor) DeleteMessage(request input.DeleteChatMessageRequest) (
 	message, err := i.Connection.ChatMessage().FindByID(request.ChatMessageID)
 	if err != nil {
 		// 冪等性を重視して、削除の場合はrecord not foundエラーにしない
-		if errors.As(err, &util_error.ErrRecordNotFound{}) {
+		if errors.As(err, &util_error.ErrEntityNotExists{}) {
 
 			return result, nil
 		}

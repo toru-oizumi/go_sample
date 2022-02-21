@@ -6,6 +6,7 @@ import (
 
 type GroupQuery interface {
 	Exists(id model.GroupID) (bool, error)
+	ExistsByName(name model.GroupName) (bool, error)
 	FindByID(id model.GroupID) (*model.Group, error)
 	FindByName(name model.GroupName) (*model.Group, error)
 	List(filter GroupFilter) ([]model.Group, error)

@@ -1,15 +1,14 @@
 package error
 
 type ErrUnknown struct {
-	Message string
-}
-
-func (e ErrUnknown) Error() string {
-	return e.Message
+	customError
 }
 
 func NewErrUnknown() ErrUnknown {
 	return ErrUnknown{
-		Message: "unknown error",
+		customError{
+			Title:   "unknown",
+			Message: "unknown error",
+		},
 	}
 }

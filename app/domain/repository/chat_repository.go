@@ -6,6 +6,7 @@ import (
 
 type ChatQuery interface {
 	Exists(id model.ChatID) (bool, error)
+	ExistsByName(name model.ChatName) (bool, error)
 	FindByID(id model.ChatID) (*model.Chat, error)
 	FindByName(name model.ChatName) (*model.Chat, error)
 	List(filter ChatFilter) ([]model.Chat, error)

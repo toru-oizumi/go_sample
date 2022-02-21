@@ -38,7 +38,7 @@ func (repo *ChatMessageRepository) FindByID(id model.ChatMessageID) (*model.Chat
 	// ToDo Join使わない方が良いか…
 	if err := repo.DB.Joins("CreatedBy").Take(&db_chat_message, "`chat_messages`.`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("ChatMessageID")
 		}
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (repo *ChatMessageRepository) Store(object model.ChatMessage) (*model.ChatM
 
 	if err := repo.DB.Create(&db_chat_message).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -94,7 +94,7 @@ func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.Chat
 
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_chat_message, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("ChatMessageID")
 		}
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (repo *ChatMessageRepository) Update(object model.ChatMessage) (*model.Chat
 
 	if err := repo.DB.Save(&db_chat_message).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}

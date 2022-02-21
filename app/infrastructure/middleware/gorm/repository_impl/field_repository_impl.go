@@ -35,7 +35,7 @@ func (repo *FieldRepository) FindByID(id model.FieldID) (*model.Field, error) {
 
 	if err := repo.DB.Take(&db_field, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("FieldID")
 		}
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (repo *FieldRepository) Store(object model.Field) (*model.FieldID, error) {
 
 	if err := repo.DB.Create(&db_field).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -89,7 +89,7 @@ func (repo *FieldRepository) Update(object model.Field) (*model.FieldID, error) 
 	var db_field db_model.FieldRDBRecord
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_field, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("FieldID")
 		}
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (repo *FieldRepository) Update(object model.Field) (*model.FieldID, error) 
 
 	if err := repo.DB.Save(&db_field).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}

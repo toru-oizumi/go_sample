@@ -31,12 +31,24 @@ func (repo *GroupRepository) Exists(id model.GroupID) (bool, error) {
 	return true, nil
 }
 
+func (repo *GroupRepository) ExistsByName(name model.GroupName) (bool, error) {
+	var db_group db_model.GroupRDBRecord
+
+	if err := repo.DB.Select("`id`").Take(&db_group, "`name` = ?", string(name)).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (repo *GroupRepository) FindByID(id model.GroupID) (*model.Group, error) {
 	var db_group db_model.GroupRDBRecord
 
 	if err := repo.DB.Joins("Chat").Take(&db_group, "`groups`.`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("GroupID")
 		}
 		return nil, err
 	}
@@ -53,7 +65,7 @@ func (repo *GroupRepository) FindByName(name model.GroupName) (*model.Group, err
 
 	if err := repo.DB.Joins("Chat").Take(&db_group, "`groups`.`name` = ?", string(name)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("GroupName")
 		}
 		return nil, err
 	}
@@ -103,7 +115,7 @@ func (repo *GroupRepository) Store(object model.Group) (*model.GroupID, error) {
 
 	if err := repo.DB.Create(&db_group).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -117,7 +129,7 @@ func (repo *GroupRepository) Update(object model.Group) (*model.GroupID, error) 
 	var db_group db_model.GroupRDBRecord
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(object.ID)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, util_error.NewErrRecordNotFound()
+			return nil, util_error.NewErrEntityNotExists("GroupID")
 		}
 		return nil, err
 	}
@@ -125,7 +137,7 @@ func (repo *GroupRepository) Update(object model.Group) (*model.GroupID, error) 
 
 	if err := repo.DB.Save(&db_group).Error; err != nil {
 		if repo.Service.IsDuplicateError(err) {
-			return nil, util_error.NewErrRecordDuplicate()
+			return nil, util_error.NewErrEntityAlreadyExists()
 		} else {
 			return nil, err
 		}
@@ -139,7 +151,7 @@ func (repo *GroupRepository) IncreaseNumberOfMembers(id model.GroupID, num uint)
 	var db_group db_model.GroupRDBRecord
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return util_error.NewErrRecordNotFound()
+			return util_error.NewErrEntityNotExists("GroupID")
 		}
 		return err
 	}
@@ -155,7 +167,7 @@ func (repo *GroupRepository) DecreaseNumberOfMembers(id model.GroupID, num uint)
 	var db_group db_model.GroupRDBRecord
 	if err := repo.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&db_group, "`id` = ?", string(id)).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return util_error.NewErrRecordNotFound()
+			return util_error.NewErrEntityNotExists("GroupID")
 		}
 		return err
 	}

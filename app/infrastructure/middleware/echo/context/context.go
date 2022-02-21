@@ -30,13 +30,13 @@ func (c *CustomContext) CreateErrorResponse(err error) error {
 
 	if apiErr.StatusCode != http.StatusInternalServerError {
 		// クライアント側起因のエラーはWarningでログを残しておく
-		c.RestApiLogger.Warning(apiErr.StatusCode, apiErr.Message)
+		c.RestApiLogger.Warning(apiErr.StatusCode, apiErr.Detail)
 	} else {
 		// InternalServerErrorの場合は、クライアント側でなくサーバー側に問題があるので、エラーログを残す
-		c.RestApiLogger.Error(apiErr.StatusCode, apiErr.Message)
+		c.RestApiLogger.Error(apiErr.StatusCode, apiErr.Detail)
 	}
 
-	c.JSON(apiErr.StatusCode, apiErr.Message)
+	c.JSON(apiErr.StatusCode, apiErr)
 	return err
 }
 
@@ -54,7 +54,7 @@ func (c *CustomContext) CheckSession() error {
 		return err
 	} else {
 		if s.Values[sessionValueName] == nil {
-			return util_error.NewErrUnauthorized()
+			return util_error.NewErrUnauthorizedRequest()
 		}
 		return nil
 	}

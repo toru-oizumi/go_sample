@@ -25,7 +25,7 @@ func (ctrl *AuthenticationController) SingIn(c context.Context) error {
 	if messages, err := ctrl.Usecase.SingIn(*request); err != nil {
 		return c.CreateErrorResponse(err)
 	} else {
-		if err := c.CreateSession(string(messages.ID)); err != nil {
+		if err := c.CreateSession(string(messages.User.ID)); err != nil {
 			return c.CreateErrorResponse(err)
 		}
 		return c.CreateSuccessResponse(http.StatusOK, messages)
@@ -60,11 +60,31 @@ func (ctrl *AuthenticationController) Activate(c context.Context) error {
 	}
 
 	if messages, err := ctrl.Usecase.Activate(*request); err != nil {
-		if err := c.CreateSession(string(messages.ID)); err != nil {
-			return c.CreateErrorResponse(err)
-		}
 		return c.CreateErrorResponse(err)
 	} else {
+		if err := c.CreateSession(string(messages.User.ID)); err != nil {
+			return c.CreateErrorResponse(err)
+		}
+		return c.CreateSuccessResponse(http.StatusOK, messages)
+	}
+}
+
+func (ctrl *AuthenticationController) ChangePassword(c context.Context) error {
+	request := new(input.ChangePasswordRequest)
+
+	if err := c.Bind(request); err != nil {
+		return c.CreateErrorResponse(err)
+	}
+	if err := c.Validate(request); err != nil {
+		return c.CreateErrorResponse(err)
+	}
+
+	if messages, err := ctrl.Usecase.ChangePassword(*request); err != nil {
+		return c.CreateErrorResponse(err)
+	} else {
+		if err := c.CreateSession(string(messages.User.ID)); err != nil {
+			return c.CreateErrorResponse(err)
+		}
 		return c.CreateSuccessResponse(http.StatusOK, messages)
 	}
 }
