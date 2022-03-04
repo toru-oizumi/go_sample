@@ -20,6 +20,10 @@ type ActivateRequest struct {
 	NewPassword     model.Password `json:"newPassword" form:"newPassword" validate:"required"`
 }
 
+type FindAccountRequest struct {
+	UserID model.UserID `json:"userID" form:"userID" validate:"required"`
+}
+
 type ChangePasswordRequest struct {
 	Email           model.Email    `json:"email" form:"email" validate:"required"`
 	CurrentPassword model.Password `json:"currentPassword" form:"currentPassword" validate:"required"`

@@ -117,6 +117,14 @@ func (i *AuthenticationInteractor) Activate(request input.ActivateRequest) (*out
 	return i.Presenter.BuildAuthenticationResponse(parsed_user)
 }
 
+func (i *AuthenticationInteractor) FindAccount(request input.FindAccountRequest) (*output.AuthenticationResponse, error) {
+	if user, err := i.Connection.User().FindByID(request.UserID); err != nil {
+		return nil, err
+	} else {
+		return i.Presenter.BuildAuthenticationResponse(*user)
+	}
+}
+
 func (i *AuthenticationInteractor) ChangePassword(request input.ChangePasswordRequest) (*output.AuthenticationResponse, error) {
 	changed_user, err := i.Connection.RunTransaction(
 		func(tx repository.Transaction) (interface{}, error) {

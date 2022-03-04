@@ -69,6 +69,22 @@ func (ctrl *AuthenticationController) Activate(c context.Context) error {
 	}
 }
 
+func (ctrl *AuthenticationController) FindAccount(c context.Context) error {
+	user_id, err := c.GetUserIDFromSession()
+	if err != nil {
+		return c.CreateErrorResponse(err)
+	}
+
+	if messages, err := ctrl.Usecase.FindAccount(input.FindAccountRequest{UserID: *user_id}); err != nil {
+		return c.CreateErrorResponse(err)
+	} else {
+		if err := c.CreateSession(string(messages.User.ID)); err != nil {
+			return c.CreateErrorResponse(err)
+		}
+		return c.CreateSuccessResponse(http.StatusOK, messages)
+	}
+}
+
 func (ctrl *AuthenticationController) ChangePassword(c context.Context) error {
 	request := new(input.ChangePasswordRequest)
 

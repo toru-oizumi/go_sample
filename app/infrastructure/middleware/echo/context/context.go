@@ -2,6 +2,8 @@ package context
 
 import (
 	"encoding/json"
+	"go_sample/app/domain/model"
+
 	"go_sample/app/infrastructure/web"
 	"go_sample/app/interface/gateway/logger"
 	"net/http"
@@ -57,6 +59,20 @@ func (c *CustomContext) CheckSession() error {
 			return util_error.NewErrUnauthorizedRequest()
 		}
 		return nil
+	}
+}
+
+func (c *CustomContext) GetUserIDFromSession() (*model.UserID, error) {
+	if s, err := session.Get(sessionName, c); err != nil {
+		return nil, err
+	} else {
+		if id := s.Values[sessionValueName]; id == nil {
+			return nil, util_error.NewErrUnauthorizedRequest()
+		} else {
+			id, _ := id.(string)
+			parsed_id := model.UserID(id)
+			return &parsed_id, nil
+		}
 	}
 }
 

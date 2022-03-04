@@ -9,6 +9,7 @@ type AuthenticationUsecase interface {
 	SingIn(request input.SignInRequest) (*output.AuthenticationResponse, error)
 	SignUp(request input.SignUpRequest) (*output.AuthenticationResponse, error)
 	Activate(request input.ActivateRequest) (*output.AuthenticationResponse, error)
+	FindAccount(request input.FindAccountRequest) (*output.AuthenticationResponse, error)
 	ChangePassword(request input.ChangePasswordRequest) (*output.AuthenticationResponse, error)
 	SignOut(request input.SignOutRequest) error
 }

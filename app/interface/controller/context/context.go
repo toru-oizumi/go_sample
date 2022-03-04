@@ -1,6 +1,9 @@
 package context
 
-import "net/http"
+import (
+	"go_sample/app/domain/model"
+	"net/http"
+)
 
 type Context interface {
 	Request() *http.Request
@@ -11,6 +14,7 @@ type Context interface {
 	Validate(i interface{}) error
 
 	CheckSession() error
+	GetUserIDFromSession() (*model.UserID, error)
 	CreateSession(userID string) error
 	UpdateSession() error
 	ExpireSession() error
