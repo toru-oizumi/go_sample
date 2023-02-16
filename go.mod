@@ -1,4 +1,4 @@
-module go_sample
+module github.com/toru-oizumi/go_sample
 
 go 1.17
 
